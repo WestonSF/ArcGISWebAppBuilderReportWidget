@@ -1,0 +1,46 @@
+.jimu-widget-report-setting {
+  width: 100%;
+  height: 100%;
+  margin:0;
+  padding:0;
+  font-size: 14px;
+}
+
+.jimu-widget-report-setting .separator{
+  margin-top:20px;
+}
+
+.jimu-widget-report-setting .setting-table{
+  width: 100%;
+}
+
+.jimu-widget-report-setting .setting-table > thead > tr > th,
+.jimu-widget-report-setting .setting-table > tbody > tr > td{
+  height:20px;
+  line-height:20px;
+  vertical-align:middle;
+}
+
+.jimu-widget-report-setting .setting-table > tbody > tr.example > td{
+  height:20px;
+  vertical-align:middle;
+}
+
+.jimu-widget-report-setting .input-table > tbody > tr > .first{
+  width:auto;
+  text-align: left;
+  padding-right:15px;
+  min-width: 100px;
+}
+
+.jimu-widget-report-setting .input-table > tbody > tr > .second{
+  width:650px;
+}
+
+.jimu-widget-report-setting .input-table > tbody > tr > .second .example {
+  font-style: italic;
+  font-size: 12px;
+  color: #a0acbf;
+  width: 100%;
+  display: inline-block;
+}

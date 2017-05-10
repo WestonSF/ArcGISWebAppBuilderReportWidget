@@ -1,0 +1,29 @@
+<div>
+    <table class="setting-table input-table" cellspacing="10">
+        <tbody>
+            <tr>
+                <td class="first">${nls.description}:</td>
+                <td class="second">
+                    <input type="text" data-dojo-type="dijit/form/ValidationTextBox"
+                           data-dojo-attach-point="description"
+                           data-dojo-props="style:{width:'100%'}"
+                           required="true" />
+                </td>
+            </tr>
+            <tr>
+                <td class="first">${nls.gpService}:</td>
+                <td class="second">
+                    <input type="text" data-dojo-type="dijit/form/ValidationTextBox"
+                           data-dojo-attach-point="gpService"
+                           data-dojo-props="style:{width:'100%'}"
+                           required="true" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="separator"><B>${nls.selectLayers}</B></p>
+    <div data-dojo-attach-point="layersTable" class="separator"></div>
+    <p class="separator"><B>${nls.mapsAvailable}</B></p>
+    <div data-dojo-attach-point="mapsTable" class="separator"></div>
+</div>

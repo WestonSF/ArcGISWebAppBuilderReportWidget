@@ -1,0 +1,25 @@
+<div>
+    <p class="description">${config.description}</p>
+    <table class="layer-table" cellspacing="0">
+        <tbody>
+            <tr>
+                <td class="first"><label data-dojo-attach-point="layerSelectLabel">${nls.layer}:</label></td>
+                <td class="second"><select id="layerSelect" data-dojo-attach-point="layerSelect" data-dojo-type="dijit/form/Select"></select></td>
+            </tr>
+        </tbody>
+    </table>
+    <br/>
+    <table cellspacing="0">
+        <tbody>
+            <tr>
+                <td class="first"><div class="featureSelected" data-dojo-attach-point="featureSelected"></div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="separator"><B>${nls.mapsProduce}</B></p>
+    <div data-dojo-attach-point="mapsTable"></div>
+
+    <div data-dojo-attach-point="submitButton" class="jimu-btn">${nls.submit}</div>
+    <div data-dojo-attach-point="loading" data-dojo-type="jimu/dijit/LoadingIndicator" data-dojo-props="hidden:true"></div>
+</div>

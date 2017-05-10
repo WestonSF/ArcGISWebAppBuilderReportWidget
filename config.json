@@ -1,0 +1,68 @@
+{
+  "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
+  "gpService": "https://gpService",
+  "layers": [
+    {
+      "layerName": "Masterton Property",
+      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/0",
+      "displayField": "Location"
+    },
+    {
+      "layerName": "Carterton Property",
+      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/1",
+      "displayField": "Location"
+    },
+    {
+      "layerName": "South Wairarapa Property",
+      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/2",
+      "displayField": "Location"
+    },
+    {
+      "layerName": "Land Parcel",
+      "serviceURL": "https://gis.mstn.govt.nz/arcgis/rest/services/PropertyAndBoundaries/Parcels/MapServer/0",
+      "displayField": "appellation"
+    }
+  ],
+  "maps": [
+    {
+      "type": "Report - Feature",
+      "title": "Property Report",
+      "scale": 0,
+      "intersectLayer": "",
+      "reportFields":[],
+      "bufferDistance": 0,
+      "operationalLayers": []
+    },
+    {
+      "type": "Map",
+      "title": "District Special Features",
+      "scale": 2000,
+      "intersectLayer": "",
+      "reportFields": [ ],
+      "bufferDistance": 0,
+      "operationalLayers": [
+        {
+          "title": "District Special Features",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SpecialFeatures/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+{
+    "type":"Report - Analysis",
+     "title": "Building Consents",
+     "scale": 0,
+     "intersectLayer":"https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+     "reportFields":["ConsentID","Proposal"],
+     "bufferDistance": 50,
+     "operationalLayers": [{
+          "id": "Building_Consents ",
+          "title": "Building Consents ",
+          "opacity": 1.0,
+          "url": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+          "secure":"true"
+     }]
+}
+  ]
+}
