@@ -93,6 +93,9 @@ function (
             this.layerTable.addRows(json);
         }
 
+        // Set the draw tools
+        this.enableDrawTools.set('checked', config.enableDraw);
+
         // Setup the maps table
         var fields = [{
             name: 'type',
@@ -309,6 +312,9 @@ function (
             json.push(data[i]);
         }
         this.config.layers = json;
+
+        // Get the draw tools option
+        this.config.enableDraw = this.enableDrawTools.checked;
 
         // Get the maps
         var data = this.mapTable.getData();

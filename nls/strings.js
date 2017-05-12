@@ -1,12 +1,11 @@
 define({
   root: ({
-     selectTab: "Selection",
-     configTab: "Report Configuration",
-     layer: "Layer",
+     selection: "Selection",
      submit: "Submit",
      mapsProduce: "Maps to Produce",
      map: "Map",
      scale: "Scale",
-     include: "Include"
+     include: "Include",
+     draw: "Draw"
   })
 });

@@ -23,6 +23,7 @@
       "displayField": "appellation"
     }
   ],
+  "enableDraw": "true",
   "maps": [
     {
       "type": "Report - Feature",
@@ -35,32 +36,65 @@
     },
     {
       "type": "Map",
-      "title": "District Special Features",
-      "scale": 2000,
+      "title": "District Plan Zones",
+      "scale": 5000,
       "intersectLayer": "",
       "reportFields": [ ],
       "bufferDistance": 0,
       "operationalLayers": [
         {
-          "title": "District Special Features",
+          "title": "District Plan Zone",
           "opacity": "0.7",
-          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SpecialFeatures/MapServer",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/Zones/MapServer",
           "secure": "false"
         }
       ]
     },
-{
-    "type":"Report - Analysis",
-     "title": "Building Consents",
-     "scale": 0,
-     "intersectLayer":"https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
-     "reportFields":["ConsentID","Proposal"],
-     "bufferDistance": 50,
-     "operationalLayers": [{
-          "id": "Building_Consents ",
+    {
+      "type": "Map",
+      "title": "Flood Zones",
+      "scale": 10000,
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
+      "reportFields": [ ],
+      "bufferDistance": 0,
+      "operationalLayers": [
+        {
+          "title": "Flood Zone",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Report - Analysis",
+      "title": "Building Consents",
+      "scale": 0,
+      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+      "reportFields": [ "ConsentID", "Proposal" ],
+      "bufferDistance": 0,
+      "operationalLayers": [
+        {
+          "id": "Building_Consents",
           "title": "Building Consents ",
           "opacity": 1.0,
           "url": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+          "secure": "true"
+        }
+      ]
+    },
+    {
+    "type":"Report - Analysis",
+     "title": "Resource Consents",
+     "scale": 0,
+     "intersectLayer":"https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
+     "reportFields":["ConsentID","Proposal"],
+     "bufferDistance": 50,
+     "operationalLayers": [{
+          "id": "Resource_Consents",
+          "title": "Resource Consents",
+          "opacity": 1.0,
+          "url": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
           "secure":"true"
      }]
 }

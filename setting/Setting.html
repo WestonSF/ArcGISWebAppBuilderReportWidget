@@ -24,6 +24,19 @@
 
     <p class="separator"><B>${nls.selectLayers}</B></p>
     <div data-dojo-attach-point="layersTable" class="separator"></div>
+
+    <table cellspacing="10">
+        <tbody>
+            <tr>
+                <td class="first">${nls.enableDrawTools}</td>
+                <td class="second">
+                    <input data-dojo-attach-point="enableDrawTools"
+                           data-dojo-type="dijit/form/CheckBox" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     <p class="separator"><B>${nls.mapsAvailable}</B></p>
     <div data-dojo-attach-point="mapsTable" class="separator"></div>
 </div>

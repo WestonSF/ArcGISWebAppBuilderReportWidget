@@ -18,6 +18,7 @@ define({
         gpService: "Reporting Geoprocessing Service",
         intersectLayer: "Intersect Service",
         bufferDistance: "Buffer Distance",
-        reportFields: "Report Fields"
+        reportFields: "Report Fields",
+        enableDrawTools: "Enable Drawing Tools"
   })
 });

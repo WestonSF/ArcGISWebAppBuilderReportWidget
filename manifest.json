@@ -4,7 +4,7 @@
   "version": "2.4",
   "wabVersion": "2.4",
   "author": "Shaun Weston",
-  "description": "Creates a maps and reports based on a feature in the map.",
+  "description": "Creates maps and reports based on a feature in the map.",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0"
 }

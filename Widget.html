@@ -3,13 +3,17 @@
     <table class="layer-table" cellspacing="0">
         <tbody>
             <tr>
-                <td class="first"><label data-dojo-attach-point="layerSelectLabel">${nls.layer}:</label></td>
+                <td class="first"><label data-dojo-attach-point="layerSelectLabel">${nls.selection}:</label></td>
                 <td class="second"><select id="layerSelect" data-dojo-attach-point="layerSelect" data-dojo-type="dijit/form/Select"></select></td>
             </tr>
         </tbody>
     </table>
-    <br/>
-    <table cellspacing="0">
+    <br />
+    <div data-dojo-attach-point="drawTools" style="display:none;">
+        <div data-dojo-attach-point="drawBox" data-dojo-type="jimu/dijit/DrawBox" data-dojo-props='geoTypes:["POINT","POLYLINE","POLYGON"],showClear:true,keepOneGraphic:true,deactivateAfterDrawing:true'></div>
+    </div>
+
+    <table cellspacing="0" data-dojo-attach-point="featureSelectedTable">
         <tbody>
             <tr>
                 <td class="first"><div class="featureSelected" data-dojo-attach-point="featureSelected"></div></td>
@@ -21,5 +25,9 @@
     <div data-dojo-attach-point="mapsTable"></div>
 
     <div data-dojo-attach-point="submitButton" class="jimu-btn">${nls.submit}</div>
-    <div data-dojo-attach-point="loading" data-dojo-type="jimu/dijit/LoadingIndicator" data-dojo-props="hidden:true"></div>
-</div>
+
+    <div data-dojo-attach-point="loading" class="loading" style="display:none;">
+        <div data-dojo-attach-point="loadingIndicator" data-dojo-type="jimu/dijit/LoadingIndicator"></div>
+        <div data-dojo-attach-point="loadingInfo">Loading...</div>
+    </div>
+    </div>
