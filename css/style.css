@@ -21,6 +21,24 @@
   min-width: 50px;
 }
 
+.jimu-widget-report .select-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
+.jimu-widget-report .multiplefeatures-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
+.jimu-widget-report .button-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
 .jimu-widget-report .layer-table > tbody > tr > .second{
   width:200px;
 }

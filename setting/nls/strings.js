@@ -19,6 +19,7 @@ define({
         intersectLayer: "Intersect Service",
         bufferDistance: "Buffer Distance",
         reportFields: "Report Fields",
-        enableDrawTools: "Enable Drawing Tools"
+        enableDrawTools: "Enable Drawing Tools",
+        showIntersectLayers: "Show Intersect Layers on Map"
   })
 });

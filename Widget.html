@@ -8,12 +8,32 @@
             </tr>
         </tbody>
     </table>
-    <br />
+    <table class="select-table" data-dojo-attach-point="multipleSelectionTable">
+        <tbody>
+            <tr>
+                <td class="first">${nls.multipleSelection}:</td>
+                <td class="second">
+                    <input id="multipleSelection" data-dojo-attach-point="multipleSelection" data-dojo-type="dijit/form/CheckBox" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     <div data-dojo-attach-point="drawTools" style="display:none;">
         <div data-dojo-attach-point="drawBox" data-dojo-type="jimu/dijit/DrawBox" data-dojo-props='geoTypes:["POINT","POLYLINE","POLYGON"],showClear:true,keepOneGraphic:true,deactivateAfterDrawing:true'></div>
     </div>
+    <br />
 
-    <table cellspacing="0" data-dojo-attach-point="featureSelectedTable">
+    <table class="multiplefeatures-table" data-dojo-attach-point="multipleFeaturesTable" style="display:none;">
+        <tbody>
+            <tr>
+                <td class="first"><label data-dojo-attach-point="multipleFeaturesLabel">${nls.multipleFeatures}:</label></td>
+                <td class="first"><select id="multipleFeaturesSelect" data-dojo-attach-point="multipleFeaturesSelect" data-dojo-type="dijit/form/Select"></select></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table data-dojo-attach-point="featureSelectedTable">
         <tbody>
             <tr>
                 <td class="first"><div class="featureSelected" data-dojo-attach-point="featureSelected"></div></td>
@@ -22,9 +42,20 @@
     </table>
 
     <p class="separator"><B>${nls.mapsProduce}</B></p>
-    <div data-dojo-attach-point="mapsTable"></div>
+    <div data-dojo-attach-point="mapsTable"></div
 
-    <div data-dojo-attach-point="submitButton" class="jimu-btn">${nls.submit}</div>
+    <table class="button-table">
+        <tbody>
+            <tr>
+                <td class="first">
+                    <div data-dojo-attach-point="submitButton" class="jimu-btn">${nls.submit}</div>
+                </td>
+                <td class="second">
+                    <div data-dojo-attach-point="clearButton" class="jimu-btn">${nls.clear}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
     <div data-dojo-attach-point="loading" class="loading" style="display:none;">
         <div data-dojo-attach-point="loadingIndicator" data-dojo-type="jimu/dijit/LoadingIndicator"></div>

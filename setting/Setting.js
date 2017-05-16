@@ -93,7 +93,7 @@ function (
             this.layerTable.addRows(json);
         }
 
-        // Set the draw tools
+        // Set the draw tools option
         this.enableDrawTools.set('checked', config.enableDraw);
 
         // Setup the maps table
@@ -190,6 +190,9 @@ function (
           'actions-edit',
           lang.hitch(this, this.editLayersClick)
         ));
+
+        // Set the intersect layers option
+        this.enableIntersectLayers.set('checked', config.showIntersectLayers);
     },
 
     // FUNCTION - When edit layers button is clicked
@@ -326,6 +329,9 @@ function (
             json.push(data[i]);
         }
         this.config.maps = json;
+
+        // Get the intersect layers option
+        this.config.showIntersectLayers = this.enableIntersectLayers.checked;
 
         // Return the configuration parameters
         return this.config;
