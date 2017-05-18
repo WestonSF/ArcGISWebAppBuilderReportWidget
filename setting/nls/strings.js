@@ -20,6 +20,7 @@ define({
         bufferDistance: "Buffer Distance",
         reportFields: "Report Fields",
         enableDrawTools: "Enable Drawing Tools",
-        showIntersectLayers: "Show Intersect Layers on Map"
+        showIntersectLayers: "Show Intersect Layers on Map",
+        defaultReportQuality: "Default Report Quality"
   })
 });

@@ -9,6 +9,7 @@ define({
      include: "Include",
      draw: "Draw",
      multipleSelection: "Select Multiple Features",
-     multipleFeatures: "Multiple Features Returned"
+     multipleFeatures: "Multiple Features Returned",
+     reportQuality: "Report Quality"
   })
 });

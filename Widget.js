@@ -11,6 +11,7 @@ define(["dojo/_base/declare",
 "jimu/BaseWidget",
 "jimu/utils",
 "jimu/dijit/SimpleTable",
+"jimu/dijit/Message",
 "esri/geometry/geometryEngine",
 "esri/geometry/Extent",
 "esri/tasks/PrintTask",
@@ -19,6 +20,7 @@ define(["dojo/_base/declare",
 "esri/tasks/Geoprocessor",
 "esri/tasks/QueryTask",
 "esri/tasks/query",
+"esri/layers/ArcGISDynamicMapServiceLayer",
 "esri/layers/FeatureLayer",
 "esri/layers/GraphicsLayer",
 "esri/renderers/SimpleRenderer",
@@ -43,6 +45,7 @@ CheckBox,
 BaseWidget,
 utils,
 Table,
+Message,
 geometryEngine,
 Extent,
 PrintTask,
@@ -51,6 +54,7 @@ PrintParameters,
 Geoprocessor,
 QueryTask,
 Query,
+ArcGISDynamicMapServiceLayer,
 FeatureLayer,
 GraphicsLayer,
 SimpleRenderer,
@@ -69,6 +73,7 @@ SimpleLineSymbol) {
     postCreate: function () {
       console.log('Report widget created...');
       this.inherited(arguments);
+      var mapFrame = this;
 
       // Initially disable submit button
       domClass.add(this.submitButton, 'jimu-state-disabled');
@@ -154,7 +159,37 @@ SimpleLineSymbol) {
           this.mapTable.addRows(json);
       }
       // Check all checkboxes
-      this.mapTable._checkAllTdCheckBoxes("include"); 
+      this.mapTable._checkAllTdCheckBoxes("include");
+
+      // Load report quality
+      reportQuality =  [
+      {
+        "label": "Low",
+        "quality": 96
+      },
+      {
+          "label": "Medium",
+          "quality": 150
+      },
+      {
+          "label": "High",
+          "quality": 300
+      }]
+
+      // Load in report quality options to dropdown
+      var len = reportQuality.length;
+      for (var a = 0; a < len; a++) {
+          var option = {
+              value: reportQuality[a].quality,
+              label: reportQuality[a].label
+          };
+          this.reportQualitySelect.addOption(option);
+
+          // Set the default option
+          if (reportQuality[a].label.toLowerCase() == this.config.defaultReportQuality.toLowerCase()) {
+              this.reportQualitySelect.set("value", reportQuality[a].quality);
+          }
+      }
     },
 
     // EVENT FUNCTION - Startup widget
@@ -163,15 +198,45 @@ SimpleLineSymbol) {
       this.inherited(arguments);
       var mapFrame = this;
       var map = this.map;
-      var graphicLayers = [];
-      var reportFeatureLayer = null;
+      // Graphic and feature layers
+      var graphicLayers = []; // Graphic selection layers that have been added to the map to show the feature(s) that is/are selected
+      var analysisfeatureLayers = []; // Analysis feature layers added to the map for querying/identifying
+      var reportFeatureLayer = null; // The report feature layer added to the map as background layer
       var selectionFeatureLayer = null;
+      // Event handlers
       var mapClickEvent = null;
       var selectionEvent = null;
       var featureSelectionEvent = null;
-      var popup = map.infoWindow;
-      var selectedFeatureJSON;
-      var selectedGeometry;
+      // Currently selected feature
+      var selectedFeatureJSON = null;
+      var selectedGeometry = null;
+      // Report Geoprocessing service
+      var gpService = null;
+
+      // On map table row click
+      this.mapTable.on("row-click", function () {
+          var allCheckboxes = mapFrame.mapTable._getAllEnabledTdCheckBoxes("include");
+          // For each of the checkboxes
+          var checked = 0;
+          array.forEach(allCheckboxes, function (checkbox) {
+              // Check if the checkbox is checked
+              if (checkbox.checked == true) {
+                  checked = checked + 1;
+              }
+          });
+          // If no checkboxes are checked
+          if (checked == 0) {
+              // Disable submit button
+              domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
+          }
+          else {
+              // If a feature has been selected
+              if (selectedFeatureJSON) {
+                  // Enable submit button
+                  domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+              }
+          }
+      });
 
       // Get the initial selection
       var selection = dijit.byId('layerSelect').attr('value')
@@ -179,8 +244,9 @@ SimpleLineSymbol) {
       changeReportLayer(selection,"add");
       // EVENT FUNCTION - When selection dropdown is changed
       this.layerSelect.on("change", function () {
-          // Reset selection
+          // Clear info window
           mapFrame.map.infoWindow.hide();
+
           domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
           mapFrame.featureSelected.innerHTML = "No features currently selected...";
           selectedFeatureJSON = null;
@@ -241,8 +307,9 @@ SimpleLineSymbol) {
 
       // EVENT FUNCTION - Clear button click
       on(this.clearButton, 'click', lang.hitch(this, function (evt) {
-          // Reset selection
+          // Clear info window
           mapFrame.map.infoWindow.hide();
+
           domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
           mapFrame.featureSelected.innerHTML = "No features currently selected...";
           selectedFeatureJSON = null;
@@ -251,11 +318,10 @@ SimpleLineSymbol) {
           dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
           html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
 
-          // Clear selection
-          map.graphics.clear();
-          selectionFeatureLayer.clear();
-          // Reset global array
-          graphicLayers = [];
+          // Clear selection graphics
+          clearSelectionGraphics();
+          // Remove any analysis feature layers from the map
+          removeAnalysisFeatureLayers();
 
           // Disable clear button
           domClass.add(mapFrame.clearButton, 'jimu-state-disabled');
@@ -267,6 +333,9 @@ SimpleLineSymbol) {
       var mapsProduce = [];
       var reportData = [];
       connect.connect(this.submitButton, 'click', lang.hitch(this, function (evt) {
+          // Remove any analysis feature layers from the map
+          removeAnalysisFeatureLayers();
+
           mapsProduce = [];
           reportData = [];
 
@@ -277,7 +346,6 @@ SimpleLineSymbol) {
 
               // If a point
               if (selectedGeometry.type.toLowerCase() == "point") {
-                  console.log(selectedGeometry);
                   // Factor for converting point to extent 
                   var factor = 20;
                   var extent = new esri.geometry.Extent(selectedGeometry.x - factor, selectedGeometry.y - factor, selectedGeometry.x + factor, selectedGeometry.y + factor, mapFrame.map.spatialReference);
@@ -286,7 +354,7 @@ SimpleLineSymbol) {
                   // Centre map on the feature
                   var extent = selectedGeometry.getExtent();
               }
-              map.setExtent(extent.expand(1));
+              map.setExtent(extent.expand(1.5));
 
               // After extent has been changed - Pan and zoom events
               panEndHandler = map.on("pan-end", analyseMaps);
@@ -298,11 +366,10 @@ SimpleLineSymbol) {
       function changeReportLayer(url,addRemove) {
         // Remove existing feature layer if single selection
           if (reportFeatureLayer) {
-            // Clear selection
-            map.graphics.clear();
-            selectionFeatureLayer.clear();
-            // Reset global array
-            graphicLayers = [];
+            // Clear selection graphics
+            clearSelectionGraphics();
+            // Remove any analysis feature layers from the map
+            removeAnalysisFeatureLayers();
             // Remove feature layer
             map.removeLayer(reportFeatureLayer);
             reportFeatureLayer = null;
@@ -314,8 +381,10 @@ SimpleLineSymbol) {
             // Add the feature layer to the map
             reportFeatureLayer = new esri.layers.FeatureLayer(url, {
                 mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
-                outFields: ["*"]
+                outFields: [],
+                opacity: 0.7
             });
+            reportFeatureLayer.id = "ReportLayer";
             map.addLayer(reportFeatureLayer);
             initSelectionLayer(url);
         }
@@ -334,20 +403,22 @@ SimpleLineSymbol) {
 
           // Add the feature layer to the map
           selectionFeatureLayer = new esri.layers.FeatureLayer(url, {
-              mode: esri.layers.FeatureLayer.MODE_SELECTION,
+              mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
               outFields: ["*"]
           });
 
           // EVENT FUNCTION - On map click
           mapClickEvent = map.on("click", function (event) {
+              // Get JSON for the current webmap
+              var printTask = new PrintTask();
+              var printParameters = new PrintParameters();
+              var webmap = printTask._getPrintDefinition(map, printParameters);
+
               // Clear graphics if single select
               var multipleSelection = dijit.byId("multipleSelection").checked;
               if (multipleSelection == false) {
-                  // Clear selection
-                  map.graphics.clear();
-                  selectionFeatureLayer.clear();
-                  // Reset global array
-                  graphicLayers = [];
+                  // Clear selection graphics
+                  clearSelectionGraphics();
               }
 
               // Setup a query
@@ -518,9 +589,10 @@ SimpleLineSymbol) {
           var printTask = new PrintTask();
           var printParameters = new PrintParameters();
           var webmap = printTask._getPrintDefinition(map, printParameters);
-          // Set print parameters
+
+          // Set the report quality
           webmap.exportOptions = {
-              "dpi": 96
+              "dpi": mapFrame.reportQualitySelect.value
           }
           webmap.layoutOptions = {
               "titleText": "",
@@ -531,7 +603,7 @@ SimpleLineSymbol) {
           // Set the scale from the map
           webmap.mapOptions.scale = map.getScale();
           webmapJSON = JSON.stringify(webmap);
-
+          
           // Get the maps to include from the table
           var userMaps = mapFrame.mapTable.getData();
           var mapsInclude = [];
@@ -805,7 +877,8 @@ SimpleLineSymbol) {
                                 // Add to features array
                                 featuresToAdd.push(feature);
                             });
-                            // Add feature layer to the map
+                            // Add feature layer to the map and global array
+                            analysisfeatureLayers.push(featureLayer);
                             map.addLayer(featureLayer);
                             // Add features to feature layer
                             featureLayer.applyEdits(featuresToAdd, null, null);
@@ -884,35 +957,67 @@ SimpleLineSymbol) {
           gpService = new Geoprocessor(mapFrame.config.gpService);
           // Setup parameters for GP service
           var gpParams = {
-              "selectedFeatureJSON": selectedFeatureJSON,
-              "webmapJSON": webmapJSON,
-              "reportJSON": reportJSON,
-              "reportDataJSON": reportDataJSON,
+              "Selected_Feature_JSON": selectedFeatureJSON,
+              "Web_Map_as_JSON": webmapJSON,
+              "Reports_JSON": reportJSON,
+              "Report_Data_JSON": reportDataJSON,
           };
           // Submit job to GP service
-          html.setStyle(mapFrame.loading, "display", "none");
-          gpService.submitJob(gpParams, gpJobComplete, gpJobStatus, gpJobFailed);
+          gpService.submitJob(gpParams);
+          // Add GP event handlers
+          gpService.on("status-update", gpJobStatus);
+          gpService.on("error", gpJobFailed);
+          gpService.on("job-complete", gpJobComplete);
+          console.time('Complete Geoprocessing Service');
       }
 
       // FUNCTION - On GP service completion
-      function gpJobComplete(jobinfo) {
-          // Hide loading
-          html.setStyle(mapFrame.loading, "display", "none");
-          mapFrame.loadingInfo.innerHTML = "Loading...";
+      function gpJobComplete(result) {
+          // If it has succeeded
+          if (result.jobInfo.jobStatus !== "esriJobFailed") {
+              mapFrame.loadingInfo.innerHTML = "Report generation complete...";
+              console.log("Report generation complete...");
+
+              // Get the output file
+              gpService.getResultData(result.jobInfo.jobId, "Output_File");
+              gpService.on("get-result-data-complete", function (output) {
+                  console.log("PDF located here - " + output.result.value.url + "...");
+                  // Open the PDF
+                  window.open(output.result.value.url);
+                  console.timeEnd('Complete Geoprocessing Service');
+              });
+
+              // Hide loading
+              html.setStyle(mapFrame.loading, "display", "none");
+              mapFrame.loadingInfo.innerHTML = "Loading...";
+          }
+          else {
+              console.error("An error occurred producing the report...");
+              // Show error message
+              new Message({
+                  type: 'error',
+                  message: String("An error occurred producing the report, please try again...")
+              });
+              console.log(result.jobInfo);
+
+              // Hide loading
+              html.setStyle(mapFrame.loading, "display", "none");
+              mapFrame.loadingInfo.innerHTML = "Loading...";
+          }
       }
 
       // FUNCTION - Get GP service job status
-      function gpJobStatus(jobinfo) {
+      function gpJobStatus(status) {
           var jobStatus = '';
-          switch (jobinfo.jobStatus) {
+          switch (status.jobInfo.jobStatus) {
               case 'esriJobSubmitted':
-                  jobStatus = 'Submitted...';
+                  jobStatus = 'Submitted job to report geoprocessing service...';
                   break;
               case 'esriJobExecuting':
-                  jobStatus = 'Executing...';
+                  jobStatus = 'Report geoprocessing service job executing...';
                   break;
               case 'esriJobSucceeded':
-                  jobStatus = 'Finished...';
+                  jobStatus = 'Report geoprocessing service job finished...';
                   break;
           }
           console.log(jobStatus);
@@ -920,10 +1025,43 @@ SimpleLineSymbol) {
 
       // FUNCTION - If GP service fails
       function gpJobFailed(error) {
-          console.error(error);
+          console.error("An error occurred producing the report...");
+          // Show error message
+          new Message({
+              type: 'error',
+              message: String("An error occurred producing the report, please try again...")
+          });
+          console.log(error);
+
           // Hide loading
           html.setStyle(mapFrame.loading, "display", "none");
           mapFrame.loadingInfo.innerHTML = "Loading...";
+      }
+
+        // FUNCTION - Clear all selection graphics  
+      function clearSelectionGraphics() {
+          if (graphicLayers.length > 0) {
+              console.log("Removing all graphic selection layers from the map...");
+              // Clear selection graphics
+              map.graphics.clear();
+              selectionFeatureLayer.clear();
+              // Reset global array for layers
+              graphicLayers = [];
+          }
+      }
+
+      // FUNCTION - Remove all analysis feature layers   
+      function removeAnalysisFeatureLayers() {
+          // Remove feature layers from the map
+          if (analysisfeatureLayers.length > 0) {
+              console.log("Removing all analysis feature layers from the map...");
+              array.forEach(analysisfeatureLayers, function (analysisfeatureLayer) {
+                  map.removeLayer(analysisfeatureLayer);
+                  analysisfeatureLayer = null;
+              });
+              // Reset global array
+              analysisfeatureLayers = [];
+          }
       }
     },
 

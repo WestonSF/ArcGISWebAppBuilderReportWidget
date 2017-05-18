@@ -42,7 +42,16 @@
     </table>
 
     <p class="separator"><B>${nls.mapsProduce}</B></p>
-    <div data-dojo-attach-point="mapsTable"></div
+    <div data-dojo-attach-point="mapsTable"></div>
+
+    <table class="reportquality-table" cellspacing="0">
+        <tbody>
+            <tr>
+                <td class="first"><label data-dojo-attach-point="reportQualityLabel">${nls.reportQuality}:</label></td>
+                <td class="second"><select id="reportQualitySelect" data-dojo-attach-point="reportQualitySelect" data-dojo-type="dijit/form/Select"></select></td>
+            </tr>
+        </tbody>
+    </table>
 
     <table class="button-table">
         <tbody>

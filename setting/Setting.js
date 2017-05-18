@@ -2,6 +2,7 @@ define([
   "dojo/_base/declare",
   "dojo/on",
   "dojo/_base/lang",
+  "dojo/_base/array",
   "dojo/_base/html",
   "dijit/_WidgetsInTemplateMixin",
   "jimu/BaseWidgetSetting",
@@ -12,6 +13,7 @@ function (
     declare,
     on,
     lang,
+    array,
     html,
     _WidgetsInTemplateMixin,
     BaseWidgetSetting,
@@ -37,6 +39,8 @@ function (
 
     // FUNCTION - Set the default configuration parameters in the configure widget from the config file
     setConfig: function (config) {
+        var mapFrame = this;
+
         // Set the description
         this.description.set('value', this.config.description);
         // Set the GP service
@@ -193,6 +197,38 @@ function (
 
         // Set the intersect layers option
         this.enableIntersectLayers.set('checked', config.showIntersectLayers);
+
+
+        // Report quality options
+        reportQuality = [
+        {
+            "label": "Low",
+            "quality": 96
+        },
+        {
+            "label": "Medium",
+            "quality": 150
+        },
+        {
+            "label": "High",
+            "quality": 300
+        }]
+        // Load in report quality options to dropdown
+        var len = reportQuality.length;
+        for (var a = 0; a < len; a++) {
+            var option = {
+                value: reportQuality[a].quality,
+                label: reportQuality[a].label
+            };
+            this.defaultReportQualitySelect.addOption(option);
+        }
+
+        // Get the default report quality
+        array.forEach(reportQuality, function (quality) {
+            if (quality["label"].toLowerCase() == config.defaultReportQuality.toLowerCase()) {
+                mapFrame.defaultReportQualitySelect.set("value", quality["quality"]);
+            }
+        });    
     },
 
     // FUNCTION - When edit layers button is clicked
@@ -302,6 +338,8 @@ function (
 
     // FUNCTION - Get the configuration parameters from the configure widget and load into configuration file
     getConfig: function () {
+        var mapFrame = this;
+
         // Get the description
         this.config.description = this.description.get('value');
         // Get the GP service
@@ -332,6 +370,27 @@ function (
 
         // Get the intersect layers option
         this.config.showIntersectLayers = this.enableIntersectLayers.checked;
+
+        // Report quality options
+        reportQuality = [
+        {
+            "label": "Low",
+            "quality": 96
+        },
+        {
+            "label": "Medium",
+            "quality": 150
+        },
+        {
+            "label": "High",
+            "quality": 300
+        }]
+        // Get the default report quality
+        array.forEach(reportQuality, function (quality) {
+            if (quality["quality"] == mapFrame.defaultReportQualitySelect.value) {
+                mapFrame.config.defaultReportQuality = quality["label"].toLowerCase();
+            }
+        });
 
         // Return the configuration parameters
         return this.config;

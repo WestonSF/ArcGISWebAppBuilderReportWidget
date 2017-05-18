@@ -33,14 +33,16 @@
   min-width: 100px;
 }
 
-.jimu-widget-report-setting .input-table > tbody > tr > .second{
-  width:650px;
+.jimu-widget-report-setting .defaultreportquality-table {
+  margin-top: 10px;
 }
 
-.jimu-widget-report-setting .input-table > tbody > tr > .second .example {
-  font-style: italic;
-  font-size: 12px;
-  color: #a0acbf;
-  width: 100%;
-  display: inline-block;
+.jimu-widget-report-setting .defaultreportquality-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
+.jimu-widget-report-setting .input-table > tbody > tr > .second{
+  width:650px;
 }

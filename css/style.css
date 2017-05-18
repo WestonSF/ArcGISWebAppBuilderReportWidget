@@ -33,7 +33,21 @@
   min-width: 50px;
 }
 
+.jimu-widget-report .button-table {
+  margin-top: 10px;
+}
+
 .jimu-widget-report .button-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
+.jimu-widget-report .reportquality-table {
+  margin-top: 10px;
+}
+
+.jimu-widget-report .reportquality-table > tbody > tr > .first{
   text-align: left;
   padding-right:15px;
   min-width: 50px;
@@ -66,4 +80,9 @@
     margin-top: 10px;
     background-color: #485566;
     color: #ffffff;
+}
+
+.jimu-popup {
+  font-weight: bold;
+  color: #000000;
 }

@@ -1,6 +1,6 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
-  "gpService": "",
+  "gpService": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/ArcGISReport/GPServer/ArcGIS%20Report",
   "layers": [
     {
       "layerName": "Masterton Property",
@@ -30,16 +30,16 @@
       "title": "Property Report",
       "scale": 0,
       "intersectLayer": "",
-      "reportFields": [ ],
+      "reportFields": [],
       "bufferDistance": 0,
-      "operationalLayers": [ ]
+      "operationalLayers": []
     },
     {
       "type": "Map",
       "title": "District Plan Zones",
       "scale": 5000,
       "intersectLayer": "",
-      "reportFields": [ ],
+      "reportFields": [],
       "bufferDistance": 0,
       "operationalLayers": [
         {
@@ -55,7 +55,7 @@
       "title": "Flood Zones",
       "scale": 10000,
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
-      "reportFields": [ ],
+      "reportFields": [],
       "bufferDistance": 0,
       "operationalLayers": [
         {
@@ -71,12 +71,17 @@
       "title": "Building Consents Report",
       "scale": 0,
       "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
-      "reportFields": [ "ConsentID", "Proposal" ],
+      "reportFields": [
+        "ConsentID",
+        "Location",
+        "Proposal",
+        "Status"
+      ],
       "bufferDistance": 0,
       "operationalLayers": [
         {
           "title": "Building Consents",
-          "opacity": 1.0,
+          "opacity": 1,
           "url": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
           "secure": "true"
         }
@@ -87,17 +92,23 @@
       "title": "Resource Consents Report",
       "scale": 0,
       "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
-      "reportFields": [ "ConsentID", "Proposal" ],
+      "reportFields": [
+        "ConsentID",
+        "Location",
+        "Proposal",
+        "Status"
+      ],
       "bufferDistance": 50,
       "operationalLayers": [
         {
           "title": "Resource Consents",
-          "opacity": 1.0,
+          "opacity": 1,
           "url": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
           "secure": "true"
         }
       ]
     }
   ],
-  "showIntersectLayers": "true"
+  "showIntersectLayers": "true",
+  "defaultReportQuality": "Medium"
 }
