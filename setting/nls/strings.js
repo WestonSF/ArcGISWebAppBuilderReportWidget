@@ -21,6 +21,7 @@ define({
         reportFields: "Report Fields",
         enableDrawTools: "Enable Drawing Tools",
         showIntersectLayers: "Show Intersect Layers on Map",
-        defaultReportQuality: "Default Report Quality"
+        defaultReportQuality: "Default Report Quality",
+        downloadDataIntersectLayers: "Download Data from Intersect Layers"
   })
 });

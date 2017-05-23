@@ -1,114 +1,77 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
-  "gpService": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/ArcGISReport/GPServer/ArcGIS%20Report",
+  "gpService": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
   "layers": [
     {
-      "layerName": "Masterton Property",
-      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/0",
-      "displayField": "Location"
-    },
-    {
-      "layerName": "Carterton Property",
-      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/1",
-      "displayField": "Location"
-    },
-    {
-      "layerName": "South Wairarapa Property",
-      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/2",
-      "displayField": "Location"
-    },
-    {
       "layerName": "Land Parcel",
-      "serviceURL": "https://gis.mstn.govt.nz/arcgis/rest/services/PropertyAndBoundaries/Parcels/MapServer/0",
+      "serviceURL": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/LINZ/Parcels/MapServer/0",
       "displayField": "appellation"
     }
   ],
   "enableDraw": "true",
   "maps": [
     {
-      "type": "Report - Feature",
-      "title": "Property Report",
-      "scale": 0,
-      "intersectLayer": "",
-      "reportFields": [],
-      "bufferDistance": 0,
-      "operationalLayers": []
-    },
-    {
-      "type": "Map",
-      "title": "District Plan Zones",
-      "scale": 5000,
-      "intersectLayer": "",
-      "reportFields": [],
-      "bufferDistance": 0,
+      "type": "Report - Analysis",
+      "title": "Freshwater Fish Species - NZFFD",
+      "scale": "",
+      "intersectLayer": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/0",
+      "bufferDistance": "",
+      "reportFields": "spfullname,catchname,org,AreaMetres,SpawnFdate,SpawnTdate",
       "operationalLayers": [
         {
-          "title": "District Plan Zone",
-          "opacity": "0.7",
-          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/Zones/MapServer",
+          "title": "Fish Spawning Habitats",
+          "opacity": "0.9",
+          "url": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/0",
           "secure": "false"
-        }
-      ]
-    },
-    {
-      "type": "Map",
-      "title": "Flood Zones",
-      "scale": 10000,
-      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
-      "reportFields": [],
-      "bufferDistance": 0,
-      "operationalLayers": [
+        },
         {
-          "title": "Flood Zone",
-          "opacity": "0.7",
-          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
+          "title": "Non-Migratory Fish Habitats",
+          "opacity": "0.8",
+          "url": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/2",
           "secure": "false"
         }
       ]
     },
     {
       "type": "Report - Analysis",
-      "title": "Building Consents Report",
-      "scale": 0,
-      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
-      "reportFields": [
-        "ConsentID",
-        "Location",
-        "Proposal",
-        "Status"
-      ],
-      "bufferDistance": 0,
+      "title": "Freshwater Fish Species - Modelled",
+      "scale": "",
+      "intersectLayer": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/1",
+      "bufferDistance": "",
+      "reportFields": "FishSpCode,gt50probab,NZREACH,AreaMetres",
       "operationalLayers": [
         {
-          "title": "Building Consents",
-          "opacity": 1,
-          "url": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
-          "secure": "true"
+          "title": "Modelled Probability of over 50%",
+          "opacity": "0.9",
+          "url": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/1",
+          "secure": "false"
+        },
+        {
+          "title": "Non-Migratory Fish Habitats",
+          "opacity": "0.8",
+          "url": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/2",
+          "secure": "false"
         }
       ]
     },
     {
       "type": "Report - Analysis",
-      "title": "Resource Consents Report",
-      "scale": 0,
-      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
-      "reportFields": [
-        "ConsentID",
-        "Location",
-        "Proposal",
-        "Status"
-      ],
-      "bufferDistance": 50,
+      "title": "Erosion Susceptibility",
+      "scale": "",
+      "intersectLayer": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/3",
+      "bufferDistance": "",
+      "reportFields": "CODE,Descriptio,AreaMetres,ESC2017",
       "operationalLayers": [
         {
-          "title": "Resource Consents",
-          "opacity": 1,
-          "url": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
-          "secure": "true"
+          "title": "Erosion Susceptibility",
+          "opacity": "0.8",
+          "url": "https://services2.arcgis.com/28amRQMPTiEvaF1p/ArcGIS/rest/services/AGOL_NES_FSI_ESC/FeatureServer/3",
+          "secure": "false"
         }
       ]
     }
   ],
   "showIntersectLayers": "true",
-  "defaultReportQuality": "Medium"
+  "downloadDataIntersectLayers": "true",
+  "defaultReportQuality": "medium"
 }

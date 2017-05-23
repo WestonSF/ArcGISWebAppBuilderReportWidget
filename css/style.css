@@ -53,6 +53,16 @@
   min-width: 50px;
 }
 
+.jimu-widget-report .datadownloadformat-table {
+  margin-top: 10px;
+}
+
+.jimu-widget-report .datadownloadformat-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
 .jimu-widget-report .layer-table > tbody > tr > .second{
   width:200px;
 }

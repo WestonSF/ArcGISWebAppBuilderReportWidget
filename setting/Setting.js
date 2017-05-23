@@ -198,6 +198,8 @@ function (
         // Set the intersect layers option
         this.enableIntersectLayers.set('checked', config.showIntersectLayers);
 
+        // Set the download data option
+        this.downloadDataIntersectLayers.set('checked', config.downloadDataIntersectLayers);
 
         // Report quality options
         reportQuality = [
@@ -370,6 +372,9 @@ function (
 
         // Get the intersect layers option
         this.config.showIntersectLayers = this.enableIntersectLayers.checked;
+
+        // Get the download data option
+        this.config.downloadDataIntersectLayers = this.downloadDataIntersectLayers.checked;
 
         // Report quality options
         reportQuality = [

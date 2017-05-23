@@ -20,7 +20,6 @@ define(["dojo/_base/declare",
 "esri/tasks/Geoprocessor",
 "esri/tasks/QueryTask",
 "esri/tasks/query",
-"esri/layers/ArcGISDynamicMapServiceLayer",
 "esri/layers/FeatureLayer",
 "esri/layers/GraphicsLayer",
 "esri/renderers/SimpleRenderer",
@@ -54,7 +53,6 @@ PrintParameters,
 Geoprocessor,
 QueryTask,
 Query,
-ArcGISDynamicMapServiceLayer,
 FeatureLayer,
 GraphicsLayer,
 SimpleRenderer,
@@ -68,6 +66,7 @@ SimpleLineSymbol) {
   // Base widget
   return declare([BaseWidget, _WidgetsInTemplateMixin], {
     baseClass: 'jimu-widget-report',  
+    widgetState: null,
 
     // EVENT FUNCTION - Creation of widget
     postCreate: function () {
@@ -94,7 +93,7 @@ SimpleLineSymbol) {
       // If draw functionality is enabled
       if (String(this.config.enableDraw).toLowerCase() == "true") {
           var option = {
-              value: this.nls.draw,
+              value: "Draw",
               label: this.nls.draw
           };
           this.layerSelect.addOption(option);
@@ -190,11 +189,44 @@ SimpleLineSymbol) {
               this.reportQualitySelect.set("value", reportQuality[a].quality);
           }
       }
+
+      // Load in data download formats if needed
+      if (String(this.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+          html.setStyle(this.dataDownloadFormatTable, "display", "block");
+
+          // Load data download options
+          dataOptions = [
+          {
+              "label": "CSV",
+              "value": "CSV"
+          },
+          {
+              "label": "File Geodatabase",
+              "value": "File Geodatabase"
+          },
+          {
+              "label": "Shapefile",
+              "value": "Shapefile"
+          }]
+
+          // Load in data download options to dropdown
+          var len = dataOptions.length;
+          for (var a = 0; a < len; a++) {
+              var option = {
+                  value: dataOptions[a].value,
+                  label: dataOptions[a].label
+              };
+              this.dataDownloadFormatSelect.addOption(option);
+          }
+          // Set the default option
+          this.dataDownloadFormatSelect.set("value", "CSV");
+      }
     },
 
     // EVENT FUNCTION - Startup widget
     startup: function () {
       console.log("Report widget started...");
+      widgetState = "Open";
       this.inherited(arguments);
       var mapFrame = this;
       var map = this.map;
@@ -212,6 +244,7 @@ SimpleLineSymbol) {
       var selectedGeometry = null;
       // Report Geoprocessing service
       var gpService = null;
+      var reportGenerating = false;
 
       // On map table row click
       this.mapTable.on("row-click", function () {
@@ -332,16 +365,19 @@ SimpleLineSymbol) {
       var zoomEndHandler;
       var mapsProduce = [];
       var reportData = [];
+      var downloadData = [];
       connect.connect(this.submitButton, 'click', lang.hitch(this, function (evt) {
           // Remove any analysis feature layers from the map
           removeAnalysisFeatureLayers();
 
           mapsProduce = [];
           reportData = [];
+          downloadData = [];
 
           // If a feature has been selected
           if (selectedFeatureJSON) {
               // Show loading
+              reportGenerating = true;
               html.setStyle(mapFrame.loading, "display", "block");
 
               // If a point
@@ -409,31 +445,39 @@ SimpleLineSymbol) {
 
           // EVENT FUNCTION - On map click
           mapClickEvent = map.on("click", function (event) {
-              // Get JSON for the current webmap
-              var printTask = new PrintTask();
-              var printParameters = new PrintParameters();
-              var webmap = printTask._getPrintDefinition(map, printParameters);
+              // If a report isn't already generating, draw is not selected and widget is open
+              if ((reportGenerating == false) && (mapFrame.layerSelect.value.toLowerCase() != "draw") && (widgetState.toLowerCase() == "open")) {
+                  // Get JSON for the current webmap
+                  var printTask = new PrintTask();
+                  var printParameters = new PrintParameters();
+                  var webmap = printTask._getPrintDefinition(map, printParameters);
 
-              // Clear graphics if single select
-              var multipleSelection = dijit.byId("multipleSelection").checked;
-              if (multipleSelection == false) {
-                  // Clear selection graphics
-                  clearSelectionGraphics();
+                  // Clear graphics if single select
+                  var multipleSelection = dijit.byId("multipleSelection").checked;
+                  if (multipleSelection == false) {
+                      // Clear selection graphics
+                      clearSelectionGraphics();
+                  }
+
+                  // Setup a query
+                  var selectQuery = new Query();
+                  // Get the map point and make a selection
+                  selectQuery.geometry = event.mapPoint;
+                  selectionFeatureLayer.selectFeatures(selectQuery,
+                            FeatureLayer.SELECTION_NEW);
+                  // Show loading
+                  html.setStyle(mapFrame.loading, "display", "block");
+                  mapFrame.loadingInfo.innerHTML = "Loading...";
               }
-
-              // Setup a query
-              var selectQuery = new Query();
-              // Get the map point and make a selection
-              selectQuery.geometry = event.mapPoint;
-              selectionFeatureLayer.selectFeatures(selectQuery,
-                        FeatureLayer.SELECTION_NEW);
-
-              // Enable clear button
-              domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
           });
 
           // EVENT FUNCTION - On feature layer selection complete
           selectionEvent = selectionFeatureLayer.on("selection-complete", function (selection) {
+            // Hide loading
+            html.setStyle(mapFrame.loading, "display", "none");
+            mapFrame.loadingInfo.innerHTML = "Loading...";
+            // Enable clear button
+            domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
             // Set the symbology
             switch (selectionFeatureLayer.geometryType) {
                 case "esriGeometryPoint":
@@ -460,6 +504,8 @@ SimpleLineSymbol) {
                 graphicLayers.push(feature);
                 map.graphics.add(feature);
             });
+            // Refresh graphics layer
+            map.graphics.redraw();
             // Update the selection info
             updateSelectionInfo();
           });
@@ -493,9 +539,7 @@ SimpleLineSymbol) {
                   dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
                   var len = graphicLayers.length;
                   for (var a = 0; a < len; a++) {
-                      var multipleFeaturesResult = {
-
-                      };
+                      var multipleFeaturesResult = {};
 
                       // Load in the features to the dropdown
                       var option = {
@@ -603,7 +647,7 @@ SimpleLineSymbol) {
           // Set the scale from the map
           webmap.mapOptions.scale = map.getScale();
           webmapJSON = JSON.stringify(webmap);
-          
+
           // Get the maps to include from the table
           var userMaps = mapFrame.mapTable.getData();
           var mapsInclude = [];
@@ -666,6 +710,8 @@ SimpleLineSymbol) {
               var layerQueries = [];
               var mapLayerQueries = [];
               var mapLayerQueryURLs = [];
+              // For each of the results
+              var count = 0;
               array.forEach(mapsAnalyse, function (mapAnalyse) {
                   // Split the URL
                   var urlSplit = mapAnalyse.intersectLayer.split("/");
@@ -693,6 +739,12 @@ SimpleLineSymbol) {
                       intersectQueries.push(executeQuery);
                       mapIntersectQueries.push(mapAnalyse);
                       mapLayerQueryURLs.push(mapAnalyse.intersectLayer);
+                  }
+                  count = count + 1;
+                  // If at the final result
+                  if (mapsAnalyse.length == count) {
+                      // Execute spatial query
+                      spatialQueries(intersectQueries, mapIntersectQueries, mapLayerQueryURLs);
                   }
               });
 
@@ -744,9 +796,16 @@ SimpleLineSymbol) {
                     console.log(mapIntersectQueries[count].title + "(" + mapLayerQueryURLs[count] + ") - " + result.features.length + " features returned...");
                     // If results are returned
                     if (result.features.length > 0) {
-                        var layerFields = result.fields;
+                        // Setup data to download object
+                        var data = {};
+                        var dataFeatures = [];
+                        data.fields = result.fields;
+                        data.geometryType = result.geometryType;
+                        data.spatialReference = result.spatialReference;
+                        
+
                         // Delete un-needed fields
-                        var deleteFields = ["Shape.STArea()", "Shape.STLength()"];
+                        var deleteFields = ["OBJECTID","OBJECTID_","SHAPE.STArea()","SHAPE.STLength()","Shape.STArea()", "Shape.STLength()"];
                         var fieldsLength = result.fields.length;
                         var fieldsToDelete = [];
                         // For each of the fields
@@ -830,15 +889,27 @@ SimpleLineSymbol) {
                             };
                             featureCollection.layerDefinition = {
                                 "geometryType": features[0].geometryType,
-                                "fields": result.fields
+                                "fields": result.fields,
+
                             };
                             // Create a feature layer
-                            var infoTemplate = new InfoTemplate("Details", "${*}");
+                            var infoTemplate = new InfoTemplate();
                             var featureLayer = new FeatureLayer(featureCollection,
                             {
                                 infoTemplate: infoTemplate,
                                 outFields: ["*"]
                             });
+                            // Set the info window title
+                            infoTemplate.setTitle(mapIntersectQueries[count].title);
+                            // Set the info window content
+                            var content = "";
+                            array.forEach(result.fields, function (field) {
+                                // If field is in the report fields configuration
+                                if (mapIntersectQueries[count].reportFields.includes(field['name'])) {
+                                    content = content + field['alias'] + ": ${" + field['name'] + "} <br/>";
+                                }
+                            });
+                            infoTemplate.setContent(content);
                             featureLayer.name = mapIntersectQueries[count].title;
                             // Set the feature layer renderer
                             var renderer = new SimpleRenderer(symbol);
@@ -860,40 +931,65 @@ SimpleLineSymbol) {
                                         var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
                                         feature.geometry = clippedGeometry;
                                         // Update length
-                                        var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
-                                        feature.attributes.LengthMetres = geometryLength;
+                                        if (clippedGeometry) {
+                                            var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                        }
+                                        else {
+                                            var geometryLength = 0.00;
+                                        }
+                                        feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
                                         break;
                                     case "polygon":
                                         // Clip the geometry to the selection
                                         var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
                                         feature.geometry = clippedGeometry;
                                         // Update area and length
-                                        var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
-                                        var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
-                                        feature.attributes.AreaMetres = geometryArea;
-                                        feature.attributes.LengthMetres = geometryLength;
+                                        if (clippedGeometry) {
+                                            var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
+                                            var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                        }
+                                        else {
+                                            var geometryArea = 0.00;
+                                            var geometryLength = 0.00;
+                                        }
+                                        feature.attributes.AreaMetres = parseFloat(geometryArea).toFixed(2);
+                                        feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
                                         break;
                                 }
                                 // Add to features array
                                 featuresToAdd.push(feature);
+                                // Add features to data download object
+                                var dataFeature = {};
+                                dataFeature.attributes = feature.attributes;
+                                dataFeature.geometry = {};
+                                dataFeature.geometry.rings = feature.geometry.rings;
+                                dataFeatures.push(dataFeature);
                             });
+                            data.features = dataFeatures;
+
+                            if (String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+                                // Add the data download format and title
+                                data.downloadFormat = mapFrame.dataDownloadFormatSelect.value;
+                                data.title = mapIntersectQueries[count].title;
+                            }
+
                             // Add feature layer to the map and global array
                             analysisfeatureLayers.push(featureLayer);
                             map.addLayer(featureLayer);
                             // Add features to feature layer
                             featureLayer.applyEdits(featuresToAdd, null, null);
-
                             // Enable clear button
                             domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
                         }
-                    }
+                        downloadData.push(data);
+                    }  
                     count = count + 1;
                     // If at the final result
                     if (results.length == count) {
                         // Submit report to GP service
                         submitReport();
                     }
-                  });
+              });
           });
       }
 
@@ -940,11 +1036,19 @@ SimpleLineSymbol) {
           // Get the report data JSON
           var reportDataJSON = JSON.stringify(reportData);
 
+          // If download data is enabled
+          if (String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+              // Get the data download JSON
+              var downloadDataJSON = JSON.stringify(downloadData);
+          }
+          else {
+              var downloadDataJSON = null;
+          }
+
           mapFrame.loadingInfo.innerHTML = "Creating maps...";
           array.forEach(mapsProduce, function (map) {
               mapFrame.loadingInfo.innerHTML = mapFrame.loadingInfo.innerHTML + "<BR/>" + map;
           });
-          console.log("Submitting job to geoprocessing service...");
           console.log("-----Selected Feature JSON-----");
           console.log(selectedFeatureJSON);
           console.log("-----Webmap JSON-----");
@@ -953,6 +1057,8 @@ SimpleLineSymbol) {
           console.log(reportJSON);
           console.log("-----Report Data JSON-----");
           console.log(reportDataJSON);
+          console.log("-----Download Data JSON-----");
+          console.log(downloadDataJSON);
           // Setup the geoprocessing service
           gpService = new Geoprocessor(mapFrame.config.gpService);
           // Setup parameters for GP service
@@ -961,79 +1067,81 @@ SimpleLineSymbol) {
               "Web_Map_as_JSON": webmapJSON,
               "Reports_JSON": reportJSON,
               "Report_Data_JSON": reportDataJSON,
+              "Download_Data_JSON": downloadDataJSON,
           };
+
           // Submit job to GP service
           gpService.submitJob(gpParams);
           // Add GP event handlers
           gpService.on("status-update", gpJobStatus);
-          gpService.on("error", gpJobFailed);
-          gpService.on("job-complete", gpJobComplete);
+          gpService.on("job-complete", gpComplete);
+          gpService.on("error", gpError);
           console.time('Complete Geoprocessing Service');
-      }
-
-      // FUNCTION - On GP service completion
-      function gpJobComplete(result) {
-          // If it has succeeded
-          if (result.jobInfo.jobStatus !== "esriJobFailed") {
-              mapFrame.loadingInfo.innerHTML = "Report generation complete...";
-              console.log("Report generation complete...");
-
-              // Get the output file
-              gpService.getResultData(result.jobInfo.jobId, "Output_File");
-              gpService.on("get-result-data-complete", function (output) {
-                  console.log("PDF located here - " + output.result.value.url + "...");
-                  // Open the PDF
-                  window.open(output.result.value.url);
-                  console.timeEnd('Complete Geoprocessing Service');
-              });
-
-              // Hide loading
-              html.setStyle(mapFrame.loading, "display", "none");
-              mapFrame.loadingInfo.innerHTML = "Loading...";
-          }
-          else {
-              console.error("An error occurred producing the report...");
-              // Show error message
-              new Message({
-                  type: 'error',
-                  message: String("An error occurred producing the report, please try again...")
-              });
-              console.log(result.jobInfo);
-
-              // Hide loading
-              html.setStyle(mapFrame.loading, "display", "none");
-              mapFrame.loadingInfo.innerHTML = "Loading...";
-          }
       }
 
       // FUNCTION - Get GP service job status
       function gpJobStatus(status) {
-          var jobStatus = '';
           switch (status.jobInfo.jobStatus) {
               case 'esriJobSubmitted':
-                  jobStatus = 'Submitted job to report geoprocessing service...';
+                  // Log status
+                  console.log("Submitted job to report geoprocessing service...");
                   break;
               case 'esriJobExecuting':
-                  jobStatus = 'Report geoprocessing service job executing...';
+                  // Log status
+                  console.log("Report geoprocessing service job executing...");
                   break;
-              case 'esriJobSucceeded':
-                  jobStatus = 'Report geoprocessing service job finished...';
+              case 'esriJobFailed':
+                  // Log job information
+                  console.log(status.jobInfo);
                   break;
           }
-          console.log(jobStatus);
       }
 
-      // FUNCTION - If GP service fails
-      function gpJobFailed(error) {
+      // FUNCTION - GP service complete
+      function gpComplete(result) {
+          // Get the output report
+          gpService.getResultData(result.jobInfo.jobId, "Output_File");
+          getReportEvent = gpService.on("get-result-data-complete", function (outputReport) {
+              mapFrame.loadingInfo.innerHTML = "Report generation complete...";
+              console.log("Report geoprocessing service job finished...");
+              console.log("PDF located here - " + outputReport.result.value.url + "...");
+              // Open the PDF
+              window.open(outputReport.result.value.url);
+              console.timeEnd('Complete Geoprocessing Service');
+              getReportEvent.remove();
+
+              // Get the output data if needed
+              if (String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+                  gpService.getResultData(result.jobInfo.jobId, "Output_Data");
+                  getDataEvent = gpService.on("get-result-data-complete", function (outputData) {
+                      console.log("Data located here - " + outputData.result.value.url + "...");
+                      // Download the data
+                      window.open(outputData.result.value.url);
+                      getDataEvent.remove();
+                  });
+              }
+
+          });
+
+          // Hide loading
+          reportGenerating = false;
+          html.setStyle(mapFrame.loading, "display", "none");
+          mapFrame.loadingInfo.innerHTML = "Loading...";
+      }
+
+      // FUNCTION - Error from GP service
+      function gpError(error) {
+          // Log error message
           console.error("An error occurred producing the report...");
           // Show error message
           new Message({
               type: 'error',
               message: String("An error occurred producing the report, please try again...")
           });
-          console.log(error);
+          console.error(error.error);
 
           // Hide loading
+          reportGenerating = false;
           html.setStyle(mapFrame.loading, "display", "none");
           mapFrame.loadingInfo.innerHTML = "Loading...";
       }
@@ -1068,21 +1176,25 @@ SimpleLineSymbol) {
     // EVENT FUNCTION - Open widget
     onOpen: function(){
         console.log('Report widget opened...');
+        widgetState = "Open";
     },
 
     // EVENT FUNCTION - Close widget
     onClose: function(){
         console.log('Report widget closed...');
+        widgetState = "Closed";
     },
 
     // EVENT FUNCTION - Minimise widget
     onMinimize: function(){
         console.log('Report widget minimised...');
+        widgetState = "Open";
     },
 
     // EVENT FUNCTION - Maximised widget
     onMaximize: function(){
         console.log('Report widget maximised...');
+        widgetState = "Open";
     }
   });
 });

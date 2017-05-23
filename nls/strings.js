@@ -10,6 +10,7 @@ define({
      draw: "Draw",
      multipleSelection: "Select Multiple Features",
      multipleFeatures: "Multiple Features Returned",
-     reportQuality: "Report Quality"
+     reportQuality: "Report Quality",
+     dataDownloadFormat: "Data Format for Download"
   })
 });
