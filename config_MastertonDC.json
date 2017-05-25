@@ -1,0 +1,105 @@
+{
+  "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
+  "gpService": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "layers": [
+    {
+      "layerName": "Masterton Property",
+      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/0",
+      "displayField": "Location"
+    },
+    {
+      "layerName": "Carterton Property",
+      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/1",
+      "displayField": "Location"
+    },
+    {
+      "layerName": "South Wairarapa Property",
+      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/2",
+      "displayField": "Location"
+    },
+    {
+      "layerName": "Land Parcel",
+      "serviceURL": "https://gis.mstn.govt.nz/arcgis/rest/services/PropertyAndBoundaries/Parcels/MapServer/0",
+      "displayField": "appellation"
+    }
+  ],
+  "enableDraw": "true",
+  "maps": [
+    {
+      "type": "Report - Feature",
+      "title": "Property Report",
+      "scale": "",
+      "intersectLayer": "",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": []
+    },
+    {
+      "type": "Map",
+      "title": "District Plan Zones",
+      "scale": "5000",
+      "intersectLayer": "",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "District Plan Zone",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/Zones/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Flood Zones",
+      "scale": "10000",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Flood Zone",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Report - Analysis",
+      "title": "Building Consents Report",
+      "scale": "",
+      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+      "bufferDistance": "",
+      "reportFields": "ConsentID,Location,Proposal,Status",
+      "operationalLayers": [
+        {
+          "title": "Building Consents",
+          "opacity": 1,
+          "url": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+          "secure": "true"
+        }
+      ]
+    },
+    {
+      "type": "Report - Analysis",
+      "title": "Resource Consents Report",
+      "scale": "",
+      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
+      "bufferDistance": "50",
+      "reportFields": "ConsentID,Location,Proposal,Status",
+      "operationalLayers": [
+        {
+          "title": "Resource Consents",
+          "opacity": 1,
+          "url": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
+          "secure": "true"
+        }
+      ]
+    }
+  ],
+  "showIntersectLayers": "true",
+  "downloadDataIntersectLayers": "true",
+  "defaultReportQuality": "medium"
+}

@@ -67,6 +67,14 @@ SimpleLineSymbol) {
   return declare([BaseWidget, _WidgetsInTemplateMixin], {
     baseClass: 'jimu-widget-report',  
     widgetState: null,
+    // Graphic and feature layers
+    graphicLayers: [], // Graphic selection layers that have been added to the map to show the feature(s) that is/are selected
+    analysisfeatureLayers: [], // Analysis feature layers added to the map for querying/identifying
+    reportFeatureLayer: null, // The report feature layer added to the map as background layer
+    selectionFeatureLayer: null,
+    // Currently selected feature
+    selectedFeatureJSON: null,
+    selectedGeometry: null,
 
     // EVENT FUNCTION - Creation of widget
     postCreate: function () {
@@ -230,18 +238,10 @@ SimpleLineSymbol) {
       this.inherited(arguments);
       var mapFrame = this;
       var map = this.map;
-      // Graphic and feature layers
-      var graphicLayers = []; // Graphic selection layers that have been added to the map to show the feature(s) that is/are selected
-      var analysisfeatureLayers = []; // Analysis feature layers added to the map for querying/identifying
-      var reportFeatureLayer = null; // The report feature layer added to the map as background layer
-      var selectionFeatureLayer = null;
       // Event handlers
       var mapClickEvent = null;
       var selectionEvent = null;
       var featureSelectionEvent = null;
-      // Currently selected feature
-      var selectedFeatureJSON = null;
-      var selectedGeometry = null;
       // Report Geoprocessing service
       var gpService = null;
       var reportGenerating = false;
@@ -352,9 +352,9 @@ SimpleLineSymbol) {
           html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
 
           // Clear selection graphics
-          clearSelectionGraphics();
+          mapFrame.clearSelectionGraphics();
           // Remove any analysis feature layers from the map
-          removeAnalysisFeatureLayers();
+          mapFrame.removeAnalysisFeatureLayers();
 
           // Disable clear button
           domClass.add(mapFrame.clearButton, 'jimu-state-disabled');
@@ -368,7 +368,7 @@ SimpleLineSymbol) {
       var downloadData = [];
       connect.connect(this.submitButton, 'click', lang.hitch(this, function (evt) {
           // Remove any analysis feature layers from the map
-          removeAnalysisFeatureLayers();
+          mapFrame.removeAnalysisFeatureLayers();
 
           mapsProduce = [];
           reportData = [];
@@ -401,27 +401,26 @@ SimpleLineSymbol) {
       // FUNCTION - Change the report layer showing on the map
       function changeReportLayer(url,addRemove) {
         // Remove existing feature layer if single selection
-          if (reportFeatureLayer) {
+          if (mapFrame.reportFeatureLayer) {
             // Clear selection graphics
-            clearSelectionGraphics();
+            mapFrame.clearSelectionGraphics();
             // Remove any analysis feature layers from the map
-            removeAnalysisFeatureLayers();
+            mapFrame.removeAnalysisFeatureLayers();
             // Remove feature layer
-            map.removeLayer(reportFeatureLayer);
-            reportFeatureLayer = null;
-            selectionFeatureLayer = null;
+            map.removeLayer(mapFrame.reportFeatureLayer);
+            mapFrame.reportFeatureLayer = null;
+            mapFrame.selectionFeatureLayer = null;
         }
 
         // If adding layer
         if (addRemove.toLowerCase() == "add") {
             // Add the feature layer to the map
-            reportFeatureLayer = new esri.layers.FeatureLayer(url, {
+            mapFrame.reportFeatureLayer = new esri.layers.FeatureLayer(url, {
                 mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
-                outFields: [],
-                opacity: 0.7
+                outFields: []
             });
-            reportFeatureLayer.id = "ReportLayer";
-            map.addLayer(reportFeatureLayer);
+            mapFrame.reportFeatureLayer.id = "ReportLayer";
+            map.addLayer(mapFrame.reportFeatureLayer);
             initSelectionLayer(url);
         }
       }
@@ -438,7 +437,7 @@ SimpleLineSymbol) {
           }
 
           // Add the feature layer to the map
-          selectionFeatureLayer = new esri.layers.FeatureLayer(url, {
+          mapFrame.selectionFeatureLayer = new esri.layers.FeatureLayer(url, {
               mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
               outFields: ["*"]
           });
@@ -456,14 +455,14 @@ SimpleLineSymbol) {
                   var multipleSelection = dijit.byId("multipleSelection").checked;
                   if (multipleSelection == false) {
                       // Clear selection graphics
-                      clearSelectionGraphics();
+                      mapFrame.clearSelectionGraphics();
                   }
 
                   // Setup a query
                   var selectQuery = new Query();
                   // Get the map point and make a selection
                   selectQuery.geometry = event.mapPoint;
-                  selectionFeatureLayer.selectFeatures(selectQuery,
+                  mapFrame.selectionFeatureLayer.selectFeatures(selectQuery,
                             FeatureLayer.SELECTION_NEW);
                   // Show loading
                   html.setStyle(mapFrame.loading, "display", "block");
@@ -472,14 +471,14 @@ SimpleLineSymbol) {
           });
 
           // EVENT FUNCTION - On feature layer selection complete
-          selectionEvent = selectionFeatureLayer.on("selection-complete", function (selection) {
+          selectionEvent = mapFrame.selectionFeatureLayer.on("selection-complete", function (selection) {
             // Hide loading
             html.setStyle(mapFrame.loading, "display", "none");
             mapFrame.loadingInfo.innerHTML = "Loading...";
             // Enable clear button
             domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
             // Set the symbology
-            switch (selectionFeatureLayer.geometryType) {
+            switch (mapFrame.selectionFeatureLayer.geometryType) {
                 case "esriGeometryPoint":
                     var symbol = new SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 26,
                     new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
@@ -501,7 +500,7 @@ SimpleLineSymbol) {
                 // Set symbology
                 feature.setSymbol(symbol);
                 // Add to global array and map
-                graphicLayers.push(feature);
+                mapFrame.graphicLayers.push(feature);
                 map.graphics.add(feature);
             });
             // Refresh graphics layer
@@ -519,7 +518,7 @@ SimpleLineSymbol) {
           }
 
           // If features are returned
-          if (graphicLayers.length > 0) {
+          if (mapFrame.graphicLayers.length > 0) {
               // Get the display field
               reportLayer = mapFrame.layerSelect.value;
               var len = mapFrame.config.layers.length;
@@ -531,21 +530,21 @@ SimpleLineSymbol) {
 
               // If multiple features returned
               var multipleSelection = dijit.byId("multipleSelection").checked;
-              if ((graphicLayers.length > 1) && (multipleSelection == false)) {
+              if ((mapFrame.graphicLayers.length > 1) && (multipleSelection == false)) {
                   // Show multiple features selection
                   html.setStyle(mapFrame.multipleFeaturesTable, "display", "block");
 
 
                   dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
-                  var len = graphicLayers.length;
+                  var len = mapFrame.graphicLayers.length;
                   for (var a = 0; a < len; a++) {
                       var multipleFeaturesResult = {};
 
                       // Load in the features to the dropdown
                       var option = {
-                          graphic: graphicLayers[a],
-                          value: graphicLayers[a].attributes[displayField],
-                          label: graphicLayers[a].attributes[displayField]
+                          graphic: mapFrame.graphicLayers[a],
+                          value: mapFrame.graphicLayers[a].attributes[displayField],
+                          label: mapFrame.graphicLayers[a].attributes[displayField]
                       };
                       mapFrame.multipleFeaturesSelect.addOption(option);
                   }
@@ -591,7 +590,7 @@ SimpleLineSymbol) {
 
                   // For each of the graphics that have been selected
                   var graphicLayerCount = 1;
-                  array.forEach(graphicLayers, function (graphicLayer) {
+                  array.forEach(mapFrame.graphicLayers, function (graphicLayer) {
                       // Get JSON for the selected feature
                       var selectedFeature = {};
                       // Update the display text
@@ -796,13 +795,20 @@ SimpleLineSymbol) {
                     console.log(mapIntersectQueries[count].title + "(" + mapLayerQueryURLs[count] + ") - " + result.features.length + " features returned...");
                     // If results are returned
                     if (result.features.length > 0) {
+                        // For each of the fields
+                        array.forEach(result.fields, function (field) {
+                            // Clip the field length if needed
+                            if (field.name.length > 60) {
+                                field.name = field.name.substring(0, 60);
+                            }
+                        });
+
                         // Setup data to download object
                         var data = {};
                         var dataFeatures = [];
                         data.fields = result.fields;
                         data.geometryType = result.geometryType;
-                        data.spatialReference = result.spatialReference;
-                        
+                        data.spatialReference = result.spatialReference;        
 
                         // Delete un-needed fields
                         var deleteFields = ["OBJECTID","OBJECTID_","SHAPE.STArea()","SHAPE.STLength()","Shape.STArea()", "Shape.STLength()"];
@@ -918,52 +924,77 @@ SimpleLineSymbol) {
                             // For each of the features returned
                             var featuresToAdd = [];
                             array.forEach(features, function (feature) {
-                                // For each of the fields to delete
-                                array.forEach(fieldsToDelete, function (fieldToDelete) {
-                                    // Delete the field
-                                    delete feature.attributes[fieldToDelete];
-                                });
+                                // If the geometry is not null
+                                if (feature.geometry) {
+                                    // For each of the attributes
+                                    for (var key in feature.attributes) {
+                                        // Clip the field length if needed
+                                        if (key.length > 60) {
+                                            feature.attributes[key.substring(0, 60)] = feature.attributes[key];
+                                            delete feature.attributes[key];
+                                        }
+                                    }
 
-                                // Set the symbology
-                                switch (feature.geometry.type) {
-                                    case "polyline":
-                                        // Clip the geometry to the selection
-                                        var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
-                                        feature.geometry = clippedGeometry;
-                                        // Update length
-                                        if (clippedGeometry) {
-                                            var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                    // For each of the fields to delete
+                                    array.forEach(fieldsToDelete, function (fieldToDelete) {
+                                        // Delete the field
+                                        delete feature.attributes[fieldToDelete];
+                                    });
+
+                                    // Set the symbology
+                                    switch (feature.geometry.type) {
+                                        case "polyline":
+                                            // Clip the geometry to the selection
+                                            var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
+                                            feature.geometry = clippedGeometry;
+                                            // Update length
+                                            if (clippedGeometry) {
+                                                feature.geometry.type = "polyline";
+                                                var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                            }
+                                            else {
+                                                var geometryLength = 0.00;
+                                            }
+                                            feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                            break;
+                                        case "polygon":
+                                            // Clip the geometry to the selection
+                                            var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
+                                            feature.geometry = clippedGeometry;
+                                            // Update area and length
+                                            if (clippedGeometry) {
+                                                feature.geometry.type = "polygon";
+                                                var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
+                                                var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                            }
+                                            else {
+                                                var geometryArea = 0.00;
+                                                var geometryLength = 0.00;
+                                            }
+                                            feature.attributes.AreaMetres = parseFloat(geometryArea).toFixed(2);
+                                            feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                            break;
+                                    }
+                                    // Add to features array
+                                    featuresToAdd.push(feature);
+                                    // Add features to data download object
+                                    var dataFeature = {};
+                                    dataFeature.attributes = feature.attributes;
+                                    // Get the geoemtry
+                                    dataFeature.geometry = {};
+                                    if (feature.geometry) {
+                                        switch (feature.geometry.type) {
+                                            case "point":
+                                                dataFeature.geometry.x = feature.geometry.x;
+                                                dataFeature.geometry.y = feature.geometry.y;
+                                            case "polyline":
+                                                dataFeature.geometry.paths = feature.geometry.paths;
+                                            case "polygon":
+                                                dataFeature.geometry.rings = feature.geometry.rings;
                                         }
-                                        else {
-                                            var geometryLength = 0.00;
-                                        }
-                                        feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
-                                        break;
-                                    case "polygon":
-                                        // Clip the geometry to the selection
-                                        var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
-                                        feature.geometry = clippedGeometry;
-                                        // Update area and length
-                                        if (clippedGeometry) {
-                                            var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
-                                            var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
-                                        }
-                                        else {
-                                            var geometryArea = 0.00;
-                                            var geometryLength = 0.00;
-                                        }
-                                        feature.attributes.AreaMetres = parseFloat(geometryArea).toFixed(2);
-                                        feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
-                                        break;
+                                    }
+                                    dataFeatures.push(dataFeature);
                                 }
-                                // Add to features array
-                                featuresToAdd.push(feature);
-                                // Add features to data download object
-                                var dataFeature = {};
-                                dataFeature.attributes = feature.attributes;
-                                dataFeature.geometry = {};
-                                dataFeature.geometry.rings = feature.geometry.rings;
-                                dataFeatures.push(dataFeature);
                             });
                             data.features = dataFeatures;
 
@@ -974,7 +1005,7 @@ SimpleLineSymbol) {
                             }
 
                             // Add feature layer to the map and global array
-                            analysisfeatureLayers.push(featureLayer);
+                            mapFrame.analysisfeatureLayers.push(featureLayer);
                             map.addLayer(featureLayer);
                             // Add features to feature layer
                             featureLayer.applyEdits(featuresToAdd, null, null);
@@ -1145,32 +1176,33 @@ SimpleLineSymbol) {
           html.setStyle(mapFrame.loading, "display", "none");
           mapFrame.loadingInfo.innerHTML = "Loading...";
       }
+    },
 
-        // FUNCTION - Clear all selection graphics  
-      function clearSelectionGraphics() {
-          if (graphicLayers.length > 0) {
-              console.log("Removing all graphic selection layers from the map...");
-              // Clear selection graphics
-              map.graphics.clear();
-              selectionFeatureLayer.clear();
-              // Reset global array for layers
-              graphicLayers = [];
-          }
-      }
+    // FUNCTION - Clear all selection graphics 
+    clearSelectionGraphics: function () {
+        if (this.graphicLayers.length > 0) {
+            console.log("Removing all graphic selection layers from the map...");
+            // Clear selection graphics
+            this.map.graphics.clear();
+            this.selectionFeatureLayer.clear();
+            // Reset global array for layers
+            this.graphicLayers = [];
+        }
+    },
 
-      // FUNCTION - Remove all analysis feature layers   
-      function removeAnalysisFeatureLayers() {
-          // Remove feature layers from the map
-          if (analysisfeatureLayers.length > 0) {
-              console.log("Removing all analysis feature layers from the map...");
-              array.forEach(analysisfeatureLayers, function (analysisfeatureLayer) {
-                  map.removeLayer(analysisfeatureLayer);
-                  analysisfeatureLayer = null;
-              });
-              // Reset global array
-              analysisfeatureLayers = [];
-          }
-      }
+    // FUNCTION - Remove all analysis feature layers   
+    removeAnalysisFeatureLayers: function () {
+        var mapFrame = this;
+        // Remove feature layers from the map
+        if (this.analysisfeatureLayers.length > 0) {
+            console.log("Removing all analysis feature layers from the map...");
+            array.forEach(this.analysisfeatureLayers, function (analysisfeatureLayer) {
+                mapFrame.map.removeLayer(analysisfeatureLayer);
+                analysisfeatureLayer = null;
+            });
+            // Reset global array
+            this.analysisfeatureLayers = [];
+        }
     },
 
     // EVENT FUNCTION - Open widget
@@ -1183,6 +1215,25 @@ SimpleLineSymbol) {
     onClose: function(){
         console.log('Report widget closed...');
         widgetState = "Closed";
+
+        // Clear info window
+        this.map.infoWindow.hide();
+
+        domClass.add(this.submitButton, 'jimu-state-disabled');
+        this.featureSelected.innerHTML = "No features currently selected...";
+        selectedFeatureJSON = null;
+        selectedGeometry = null;
+        // Hide multiple features selection
+        dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
+        html.setStyle(this.multipleFeaturesTable, "display", "none");
+
+        // Clear selection graphics
+        this.clearSelectionGraphics();
+        // Remove any analysis feature layers from the map
+        this.removeAnalysisFeatureLayers();
+
+        // Disable clear button
+        domClass.add(this.clearButton, 'jimu-state-disabled');
     },
 
     // EVENT FUNCTION - Minimise widget

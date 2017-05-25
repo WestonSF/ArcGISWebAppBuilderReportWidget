@@ -256,10 +256,17 @@ function (
             name: 'url',
             title: this.nls.serviceURL,
             type: 'text',
-            width: '50%',
+            width: '40%',
             unique: false,
             editable: true
         }, {
+             name: 'visibleLayers',
+             title: this.nls.visibleLayers,
+             type: 'text',
+             width: '10%',
+             unique: false,
+             editable: true
+         }, {
             name: 'secure',
             title: this.nls.secure,
             type: 'text',
@@ -280,9 +287,9 @@ function (
             selectable: false
         };
         var content = html.create("div");
-        var table = new Table(args);
-        table.autoHeight = true;   
-        html.place(table.domNode, content);
+        var opLayersTable = new Table(args);
+        opLayersTable.autoHeight = true;
+        html.place(opLayersTable.domNode, content);
 
         // If there are maps
         if (this.config.maps.length > 0) {
@@ -295,21 +302,22 @@ function (
                 // For the map selected
                 if (selectionData.title == this.config.maps[a].title) {
                     // For each layer
-                    var layerLen = this.config.maps[a].operationalLayers.length
+                    var layerLen = this.config.maps[a].operationalLayers.length;
                     for (var b = 0; b < layerLen; b++) {
                         // Load the operational layer information
                         json.push({
                             title: this.config.maps[a].operationalLayers[b].title,
                             opacity: this.config.maps[a].operationalLayers[b].opacity,
                             url: this.config.maps[a].operationalLayers[b].url,
+                            visibleLayers: this.config.maps[a].operationalLayers[b].visibleLayers,
                             secure: this.config.maps[a].operationalLayers[b].secure
                         });
                     }
                 }
             }
-            table.addRows(json);
+            opLayersTable.addRows(json);
         }
-
+        
         // Show the operational layers popup
         var layersPopup = new Popup({
             titleLabel: this.nls.operationalLayers,
@@ -320,8 +328,24 @@ function (
             buttons: [{
                 label: this.nls.ok,
                 onClick: lang.hitch(this, function () {
-                    // Add operational layers data to array for selected map
-                    this.opLayerFields[selectionData.title] = table.getData();
+                    // For each of the maps
+                    var layerLen = this.config.maps.length;
+                    for (var c = 0; c < layerLen; c++) {
+                        // Get the selected map
+                        if (this.config.maps[c].title.toLowerCase() == selectionData.title.toLowerCase()) {
+                            var opLayersselectionData = opLayersTable.getData();
+                            // Update the operational layers for this map
+                            this.config.maps[c].operationalLayers = opLayersselectionData;
+
+                            // For each operational layer
+                            var layerLen = this.config.maps[c].operationalLayers.length;
+                            for (var d = 0; d < layerLen; d++) {
+                                var visibleLayers = this.config.maps[c].operationalLayers[d].visibleLayers;
+                                // Convert operational layers to array
+                                this.config.maps[c].operationalLayers[d].visibleLayers = JSON.parse("[" + visibleLayers + "]");
+                            }
+                        }
+                    }
                     layersPopup.close();
                 })
             }, {
@@ -335,7 +359,7 @@ function (
 
             }
         });
-        table.startup();
+        opLayersTable.startup();
     },
 
     // FUNCTION - Get the configuration parameters from the configure widget and load into configuration file
@@ -365,7 +389,7 @@ function (
         var len = data.length;
         for (var i = 0; i < len; i++) {
             // Add in the operational layers
-            data[i].operationalLayers = this.opLayerFields[data[i].title];
+            data[i].operationalLayers = this.config.maps[i].operationalLayers;
             json.push(data[i]);
         }
         this.config.maps = json;

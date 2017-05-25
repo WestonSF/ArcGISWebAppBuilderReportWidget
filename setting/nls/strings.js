@@ -22,6 +22,7 @@ define({
         enableDrawTools: "Enable Drawing Tools",
         showIntersectLayers: "Show Intersect Layers on Map",
         defaultReportQuality: "Default Report Quality",
-        downloadDataIntersectLayers: "Download Data from Intersect Layers"
+        downloadDataIntersectLayers: "Download Data from Intersect Layers",
+        visibleLayers: "Visible Layers"
   })
 });
