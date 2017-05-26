@@ -3,6 +3,7 @@ define({
      selection: "Selection",
      submit: "Submit",
      clear: "Clear",
+     cancel: "Cancel",
      mapsProduce: "Maps to Produce",
      map: "Map",
      scale: "Scale",

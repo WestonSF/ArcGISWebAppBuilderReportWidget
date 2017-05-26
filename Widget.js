@@ -86,7 +86,8 @@ SimpleLineSymbol) {
       domClass.add(this.submitButton, 'jimu-state-disabled');
       // Initially disable clear button
       domClass.add(this.clearButton, 'jimu-state-disabled');
-
+        // Initially disable cancel button
+      domClass.add(this.cancelButton, 'jimu-state-disabled');
 
       // Load in layers to dropdown
       var len = this.config.layers.length;
@@ -242,9 +243,11 @@ SimpleLineSymbol) {
       var mapClickEvent = null;
       var selectionEvent = null;
       var featureSelectionEvent = null;
+      var gpErrorEvent = null;
       // Report Geoprocessing service
       var gpService = null;
       var reportGenerating = false;
+      var gpServiceJobId = null;
 
       // On map table row click
       this.mapTable.on("row-click", function () {
@@ -264,7 +267,7 @@ SimpleLineSymbol) {
           }
           else {
               // If a feature has been selected
-              if (selectedFeatureJSON) {
+              if (mapFrame.selectedFeatureJSON) {
                   // Enable submit button
                   domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
               }
@@ -282,8 +285,8 @@ SimpleLineSymbol) {
 
           domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
           mapFrame.featureSelected.innerHTML = "No features currently selected...";
-          selectedFeatureJSON = null;
-          selectedGeometry = null;
+          mapFrame.selectedFeatureJSON = null;
+          mapFrame.selectedGeometry = null;
 
           var selection = this.get("value");
           // If draw selected
@@ -319,10 +322,10 @@ SimpleLineSymbol) {
           this.drawBox.on("draw-end", function () {
               // Get JSON for the drawn feature
               var selectedFeature = {};
-              selectedGeometry = this.drawLayer.graphics[0].geometry;
+              mapFrame.selectedGeometry = this.drawLayer.graphics[0].geometry;
               selectedFeature.geometry = this.drawLayer.graphics[0].geometry;
               selectedFeature.attributes = this.drawLayer.graphics[0].attributes;
-              selectedFeatureJSON = JSON.stringify(selectedFeature);
+              mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
 
               // Enable submit button
               domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
@@ -333,8 +336,8 @@ SimpleLineSymbol) {
               mapFrame.map.infoWindow.hide();
               domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
               mapFrame.featureSelected.innerHTML = "No features currently selected...";
-              selectedFeatureJSON = null;
-              selectedGeometry = null;
+              mapFrame.selectedFeatureJSON = null;
+              mapFrame.selectedGeometry = null;
           });
       }
 
@@ -345,8 +348,8 @@ SimpleLineSymbol) {
 
           domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
           mapFrame.featureSelected.innerHTML = "No features currently selected...";
-          selectedFeatureJSON = null;
-          selectedGeometry = null;
+          mapFrame.selectedFeatureJSON = null;
+          mapFrame.selectedGeometry = null;
           // Hide multiple features selection
           dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
           html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
@@ -358,6 +361,33 @@ SimpleLineSymbol) {
 
           // Disable clear button
           domClass.add(mapFrame.clearButton, 'jimu-state-disabled');
+      }));
+
+     // EVENT FUNCTION - Cancel button click
+      on(this.cancelButton, 'click', lang.hitch(this, function (evt) {
+          // If a report is generating
+          if ((reportGenerating == true) && (gpServiceJobId)) {
+              
+              // Cancel the GP service job
+              gpService.cancelJob(gpServiceJobId, function (cancel) {
+                  console.log("Report geoprocessing service job cancelled...");
+                  // Disconnect gp error handler
+                  if (gpErrorEvent) {
+                      gpErrorEvent.remove();
+                  }
+
+                  // Enable submit button
+                  domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+                  // Enable clear button
+                  domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+                  // Disable cancel button
+                  domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+                  // Hide loading
+                  reportGenerating = false;
+                  html.setStyle(mapFrame.loading, "display", "none");
+                  mapFrame.loadingInfo.innerHTML = "Loading...";
+              });
+          }
       }));
 
       // EVENT FUNCTION - Submit button click
@@ -375,20 +405,25 @@ SimpleLineSymbol) {
           downloadData = [];
 
           // If a feature has been selected
-          if (selectedFeatureJSON) {
+          if (mapFrame.selectedFeatureJSON) {
+              // Disable submit button
+              domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
+              // Disable clear button
+              domClass.add(mapFrame.clearButton, 'jimu-state-disabled');
+
               // Show loading
               reportGenerating = true;
               html.setStyle(mapFrame.loading, "display", "block");
 
               // If a point
-              if (selectedGeometry.type.toLowerCase() == "point") {
+              if (mapFrame.selectedGeometry.type.toLowerCase() == "point") {
                   // Factor for converting point to extent 
                   var factor = 20;
-                  var extent = new esri.geometry.Extent(selectedGeometry.x - factor, selectedGeometry.y - factor, selectedGeometry.x + factor, selectedGeometry.y + factor, mapFrame.map.spatialReference);
+                  var extent = new esri.geometry.Extent(mapFrame.selectedGeometry.x - factor, mapFrame.selectedGeometry.y - factor, mapFrame.selectedGeometry.x + factor, mapFrame.selectedGeometry.y + factor, mapFrame.map.spatialReference);
               }
               else {
                   // Centre map on the feature
-                  var extent = selectedGeometry.getExtent();
+                  var extent = mapFrame.selectedGeometry.getExtent();
               }
               map.setExtent(extent.expand(1.5));
 
@@ -556,10 +591,10 @@ SimpleLineSymbol) {
                           var selection = option.graphic;
                           // Get JSON for the selected feature
                           var selectedFeature = {};
-                          selectedGeometry = selection.geometry;
+                          mapFrame.selectedGeometry = selection.geometry;
                           selectedFeature.geometry = selection.geometry;
                           selectedFeature.attributes = selection.attributes;
-                          selectedFeatureJSON = JSON.stringify(selectedFeature);
+                          mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
                           // Update the display text
                           mapFrame.featureSelected.innerHTML = selectedFeature.attributes[displayField];
                       }
@@ -573,10 +608,10 @@ SimpleLineSymbol) {
                               var selection = option.graphic;
                               // Get JSON for the selected feature
                               var selectedFeature = {};
-                              selectedGeometry = selection.geometry;
+                              mapFrame.selectedGeometry = selection.geometry;
                               selectedFeature.geometry = selection.geometry;
                               selectedFeature.attributes = selection.attributes;
-                              selectedFeatureJSON = JSON.stringify(selectedFeature);
+                              mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
                               // Update the display text
                               mapFrame.featureSelected.innerHTML = selectedFeature.attributes[displayField];
                         }
@@ -596,17 +631,17 @@ SimpleLineSymbol) {
                       // Update the display text
                       if ((multipleSelection == true) && (graphicLayerCount > 1)) {
                           // Merge the geometry
-                          selectedFeature.geometry = geometryEngine.union([selectedGeometry, graphicLayer.geometry]);
-                          selectedGeometry = selectedFeature.geometry;
+                          selectedFeature.geometry = geometryEngine.union([mapFrame.selectedGeometry, graphicLayer.geometry]);
+                          mapFrame.selectedGeometry = selectedFeature.geometry;
                           mapFrame.featureSelected.innerHTML = "Multiple features currently selected...";
                       }
                       else {
                           selectedFeature.geometry = graphicLayer.geometry;
-                          selectedGeometry = graphicLayer.geometry;
+                          mapFrame.selectedGeometry = graphicLayer.geometry;
                           mapFrame.featureSelected.innerHTML = graphicLayer.attributes[displayField];
                       }
                       selectedFeature.attributes = graphicLayer.attributes;
-                      selectedFeatureJSON = JSON.stringify(selectedFeature);
+                      mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
                       graphicLayerCount = graphicLayerCount + 1;
                   });
               }
@@ -693,7 +728,7 @@ SimpleLineSymbol) {
               query.where = "1=1";
               query.outFields = ["*"];
               query.units = "meters";
-              query.geometry = selectedGeometry;
+              query.geometry = mapFrame.selectedGeometry;
               query.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
               // If showing intersect layers on the map
               if (String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") {
@@ -710,7 +745,6 @@ SimpleLineSymbol) {
               var mapLayerQueries = [];
               var mapLayerQueryURLs = [];
               // For each of the results
-              var count = 0;
               array.forEach(mapsAnalyse, function (mapAnalyse) {
                   // Split the URL
                   var urlSplit = mapAnalyse.intersectLayer.split("/");
@@ -732,18 +766,18 @@ SimpleLineSymbol) {
 
                       // Setup the query parameters
                       var queryTask = new QueryTask(url);
-                      query.distance = mapAnalyse.bufferDistance;
+                      // If doing a buffer
+                      if ((mapAnalyse.bufferDistance) && (Number(mapAnalyse.bufferDistance) > 0)) {
+                          query.distance = mapAnalyse.bufferDistance;
+                      }
+                      else {
+                          query.distance = "";
+                      }
                       var executeQuery = queryTask.execute(query);
                       // Push query to execute into array as well as the title
                       intersectQueries.push(executeQuery);
                       mapIntersectQueries.push(mapAnalyse);
                       mapLayerQueryURLs.push(mapAnalyse.intersectLayer);
-                  }
-                  count = count + 1;
-                  // If at the final result
-                  if (mapsAnalyse.length == count) {
-                      // Execute spatial query
-                      spatialQueries(intersectQueries, mapIntersectQueries, mapLayerQueryURLs);
                   }
               });
 
@@ -759,7 +793,13 @@ SimpleLineSymbol) {
                           array.forEach(result.layers, function (layer) {
                               // Setup the query parameters
                               var queryTask = new QueryTask(mapLayerQueries[count].intersectLayer + "/" + layer.id);
-                              query.distance = mapLayerQueries[count].bufferDistance;
+                              // If doing a buffer
+                              if ((mapLayerQueries[count].bufferDistance) && (Number(mapLayerQueries[count].bufferDistance) > 0)) {
+                                  query.distance = mapLayerQueries[count].bufferDistance;
+                              }
+                              else {
+                                  query.distance = "";
+                              }
                               var executeQuery = queryTask.execute(query);
                               // Push query to execute into array as well as the title
                               intersectQueries.push(executeQuery);
@@ -775,6 +815,12 @@ SimpleLineSymbol) {
                       });
                   });
               }
+              // No layer queries to perform
+              else {
+                  // Execute spatial queries
+                  spatialQueries(intersectQueries, mapIntersectQueries, mapLayerQueryURLs);
+              }
+
           }
       }
 
@@ -788,7 +834,6 @@ SimpleLineSymbol) {
               // Set up array of colours
               var fillColours = [[255,255,0,0.3],[255,0,0,0.3],[0,0,255,0.3],[0,255,0,0.3],[255,0,128,0.3],[255,128,0,0.3],[192,192,192,0.3],[128,255,128,0.3],[255,128,128,0.3],[255,128,255,0.3]]
               var lineColours = [[255,255,0],[255,0,0],[0,0,255],[0,255,0],[255,0,128],[255,128,0],[192,192,192],[128,255,128],[255,128,128],[255,128,255]]
-
               // For each of the results
               var count = 0;
               array.forEach(results, function (result) {
@@ -944,35 +989,41 @@ SimpleLineSymbol) {
                                     // Set the symbology
                                     switch (feature.geometry.type) {
                                         case "polyline":
-                                            // Clip the geometry to the selection
-                                            var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
-                                            feature.geometry = clippedGeometry;
-                                            // Update length
-                                            if (clippedGeometry) {
-                                                feature.geometry.type = "polyline";
-                                                var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                            // If not doing a buffer
+                                            if ((!mapIntersectQueries[count].bufferDistance) || (Number(mapIntersectQueries[count].bufferDistance) == 0)) {
+                                                // Clip the geometry to the selection
+                                                var clippedGeometry = geometryEngine.intersect(mapFrame.selectedGeometry, feature.geometry);
+                                                feature.geometry = clippedGeometry;
+                                                // Update length
+                                                if (clippedGeometry) {
+                                                    feature.geometry.type = "polyline";
+                                                    var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                                }
+                                                else {
+                                                    var geometryLength = 0.00;
+                                                }
+                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
                                             }
-                                            else {
-                                                var geometryLength = 0.00;
-                                            }
-                                            feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
                                             break;
                                         case "polygon":
-                                            // Clip the geometry to the selection
-                                            var clippedGeometry = geometryEngine.intersect(selectedGeometry, feature.geometry);
-                                            feature.geometry = clippedGeometry;
-                                            // Update area and length
-                                            if (clippedGeometry) {
-                                                feature.geometry.type = "polygon";
-                                                var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
-                                                var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                            // If not doing a buffer
+                                            if ((!mapIntersectQueries[count].bufferDistance) || (Number(mapIntersectQueries[count].bufferDistance) == 0)) {
+                                                // Clip the geometry to the selection
+                                                var clippedGeometry = geometryEngine.intersect(mapFrame.selectedGeometry, feature.geometry);
+                                                feature.geometry = clippedGeometry;
+                                                // Update area and length
+                                                if (clippedGeometry) {
+                                                    feature.geometry.type = "polygon";
+                                                    var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
+                                                    var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+                                                }
+                                                else {
+                                                    var geometryArea = 0.00;
+                                                    var geometryLength = 0.00;
+                                                }
+                                                feature.attributes.AreaMetres = parseFloat(geometryArea).toFixed(2);
+                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
                                             }
-                                            else {
-                                                var geometryArea = 0.00;
-                                                var geometryLength = 0.00;
-                                            }
-                                            feature.attributes.AreaMetres = parseFloat(geometryArea).toFixed(2);
-                                            feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
                                             break;
                                     }
                                     // Add to features array
@@ -1081,7 +1132,7 @@ SimpleLineSymbol) {
               mapFrame.loadingInfo.innerHTML = mapFrame.loadingInfo.innerHTML + "<BR/>" + map;
           });
           console.log("-----Selected Feature JSON-----");
-          console.log(selectedFeatureJSON);
+          console.log(mapFrame.selectedFeatureJSON);
           console.log("-----Webmap JSON-----");
           console.log(webmapJSON);
           console.log("-----Report JSON-----");
@@ -1094,7 +1145,7 @@ SimpleLineSymbol) {
           gpService = new Geoprocessor(mapFrame.config.gpService);
           // Setup parameters for GP service
           var gpParams = {
-              "Selected_Feature_JSON": selectedFeatureJSON,
+              "Selected_Feature_JSON": mapFrame.selectedFeatureJSON,
               "Web_Map_as_JSON": webmapJSON,
               "Reports_JSON": reportJSON,
               "Report_Data_JSON": reportDataJSON,
@@ -1106,12 +1157,15 @@ SimpleLineSymbol) {
           // Add GP event handlers
           gpService.on("status-update", gpJobStatus);
           gpService.on("job-complete", gpComplete);
-          gpService.on("error", gpError);
+          gpErrorEvent = gpService.on("error", gpError);
           console.time('Complete Geoprocessing Service');
+          // Enable cancel button
+          domClass.remove(mapFrame.cancelButton, 'jimu-state-disabled');
       }
 
       // FUNCTION - Get GP service job status
       function gpJobStatus(status) {
+          gpServiceJobId = status.jobInfo.jobId;
           switch (status.jobInfo.jobStatus) {
               case 'esriJobSubmitted':
                   // Log status
@@ -1154,6 +1208,12 @@ SimpleLineSymbol) {
 
           });
 
+          // Enable submit button
+          domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+          // Enable clear button
+          domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+          // Disable cancel button
+          domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
           // Hide loading
           reportGenerating = false;
           html.setStyle(mapFrame.loading, "display", "none");
@@ -1171,6 +1231,12 @@ SimpleLineSymbol) {
           });
           console.error(error.error);
 
+          // Enable submit button
+          domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+          // Enable clear button
+          domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+          // Disable cancel button
+          domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
           // Hide loading
           reportGenerating = false;
           html.setStyle(mapFrame.loading, "display", "none");
@@ -1221,8 +1287,8 @@ SimpleLineSymbol) {
 
         domClass.add(this.submitButton, 'jimu-state-disabled');
         this.featureSelected.innerHTML = "No features currently selected...";
-        selectedFeatureJSON = null;
-        selectedGeometry = null;
+        this.selectedFeatureJSON = null;
+        this.selectedGeometry = null;
         // Hide multiple features selection
         dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
         html.setStyle(this.multipleFeaturesTable, "display", "none");

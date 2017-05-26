@@ -1,6 +1,6 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
-  "gpService": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "gpService": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
  "layers": [
     {
       "layerName": "Land Parcel",

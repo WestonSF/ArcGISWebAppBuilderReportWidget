@@ -1,20 +1,20 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
-  "gpService": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "gpService": "https://gis.mstn.govt.nz/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
   "layers": [
     {
       "layerName": "Masterton Property",
-      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/0",
+      "serviceURL": "https://gis.mstn.govt.nz/arcgis/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/0",
       "displayField": "Location"
     },
     {
       "layerName": "Carterton Property",
-      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/1",
+      "serviceURL": "https://gis.mstn.govt.nz/arcgis/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/1",
       "displayField": "Location"
     },
     {
       "layerName": "South Wairarapa Property",
-      "serviceURL": "https://utility.arcgis.com/usrsvcs/servers/e44fae8303604924853a8fdf011d6ad8/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/2",
+      "serviceURL": "https://gis.mstn.govt.nz/arcgis/rest/services/PropertyAndBoundaries/PropertyInternal/MapServer/2",
       "displayField": "Location"
     },
     {
@@ -52,6 +52,82 @@
     },
     {
       "type": "Map",
+      "title": "District Plan Features",
+      "scale": "5000",
+      "intersectLayer": "",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "District Plan Feature",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SpecialFeatures/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "District Plan Management Areas",
+      "scale": "5000",
+      "intersectLayer": "",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "District Plan Management Area",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ManagementAreas/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Water Services",
+      "scale": "",
+      "intersectLayer": "",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Water Services",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/WaterInternal/MapServer",
+          "secure": "true"
+        },
+        {
+          "title": "Sewer Services",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/SewerInternal/MapServer",
+          "secure": "true"
+        },
+        {
+          "title": "Stormwater Services",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/StormwaterInternal/MapServer",
+          "secure": "true"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Water Races",
+      "scale": "",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/WaterRacesInternal/MapServer",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Water Race",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/WaterRacesInternal/MapServer",
+          "secure": "true"
+        }
+      ]
+    },
+    {
+      "type": "Map",
       "title": "Flood Zones",
       "scale": "10000",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
@@ -67,17 +143,129 @@
       ]
     },
     {
+      "type": "Map",
+      "title": "Tsunami Evacuation Zones",
+      "scale": "10000",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/TsunamiEvacuationZones/MapServer",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Tsunami Evacuation Zone",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/TsunamiEvacuationZones/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Earthquake Hazards",
+      "scale": "10000",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/EarthquakeHazards/MapServer",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Earthquake Hazard",
+          "opacity": "0.7",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/EarthquakeHazards/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Carterton Imagery - 1943",
+      "scale": "",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1943/MapServer/1",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Carterton Imagery - 1943",
+          "opacity": "1.0",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1943/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Carterton Imagery - 1961",
+      "scale": "",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1961/MapServer/1",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Carterton Imagery - 1961",
+          "opacity": "1.0",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1961/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Carterton Imagery - 1974",
+      "scale": "",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1974/MapServer/1",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Carterton Imagery - 1974",
+          "opacity": "1.0",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1974/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Carterton Imagery - 1981",
+      "scale": "",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1981/MapServer/1",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Carterton Imagery - 1981",
+          "opacity": "1.0",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1981/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
+      "type": "Map",
+      "title": "Masterton Imagery - 2002",
+      "scale": "",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery2002/MapServer/1",
+      "bufferDistance": "",
+      "reportFields": "",
+      "operationalLayers": [
+        {
+          "title": "Masterton Imagery - 2002",
+          "opacity": "1.0",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery2002/MapServer",
+          "secure": "false"
+        }
+      ]
+    },
+    {
       "type": "Report - Analysis",
       "title": "Building Consents Report",
       "scale": "",
-      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
       "bufferDistance": "",
       "reportFields": "ConsentID,Location,Proposal,Status",
       "operationalLayers": [
         {
           "title": "Building Consents",
           "opacity": 1,
-          "url": "https://utility.arcgis.com/usrsvcs/servers/1d1506152314411c85d199f1388a6667/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
           "secure": "true"
         }
       ]
@@ -85,21 +273,37 @@
     {
       "type": "Report - Analysis",
       "title": "Resource Consents Report",
-      "scale": "",
-      "intersectLayer": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
-      "bufferDistance": "50",
+      "scale": "2000",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
+      "bufferDistance": "100",
       "reportFields": "ConsentID,Location,Proposal,Status",
       "operationalLayers": [
         {
           "title": "Resource Consents",
           "opacity": 1,
-          "url": "https://utility.arcgis.com/usrsvcs/servers/8dc0200c89464b199570e0aa4c0a7264/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
           "secure": "true"
+        }
+      ]
+    },
+    {
+      "type": "Report - Analysis",
+      "title": "Selected Land Use Register Report",
+      "scale": "2000",
+      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SelectedLandUseRegister/MapServer/0",
+      "bufferDistance": "100",
+      "reportFields": "SITE_ID,FILENO,SITENAME,CATEGORY,SITE_HISTORY,Hectares",
+      "operationalLayers": [
+        {
+          "title": "Selected Land Use Register",
+          "opacity": 1,
+          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SelectedLandUseRegister/MapServer",
+          "secure": "false"
         }
       ]
     }
   ],
-  "showIntersectLayers": "true",
-  "downloadDataIntersectLayers": "true",
+  "showIntersectLayers": false,
+  "downloadDataIntersectLayers": false,
   "defaultReportQuality": "medium"
 }
