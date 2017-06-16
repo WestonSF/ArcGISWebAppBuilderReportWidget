@@ -186,7 +186,8 @@
           "title": "Carterton Imagery - 1943",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1943/MapServer",
-          "secure": "false"
+          "secure": "false",
+          "legend": "false"
         }
       ]
     },
@@ -202,7 +203,8 @@
           "title": "Carterton Imagery - 1961",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1961/MapServer",
-          "secure": "false"
+          "secure": "false",
+          "legend": "false"
         }
       ]
     },
@@ -218,7 +220,8 @@
           "title": "Carterton Imagery - 1974",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1974/MapServer",
-          "secure": "false"
+          "secure": "false",
+          "legend": "false"
         }
       ]
     },
@@ -234,7 +237,8 @@
           "title": "Carterton Imagery - 1981",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1981/MapServer",
-          "secure": "false"
+          "secure": "false",
+          "legend": "false"
         }
       ]
     },
@@ -250,7 +254,8 @@
           "title": "Masterton Imagery - 2002",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery2002/MapServer",
-          "secure": "false"
+          "secure": "false",
+          "legend": "false"
         }
       ]
     },
@@ -266,7 +271,8 @@
           "title": "Building Consents",
           "opacity": 1,
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
-          "secure": "true"
+          "secure": "true",
+          "legend": "false"
         }
       ]
     },
@@ -282,7 +288,8 @@
           "title": "Resource Consents",
           "opacity": 1,
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
-          "secure": "true"
+          "secure": "true",
+          "legend": "false"
         }
       ]
     },
@@ -298,12 +305,14 @@
           "title": "Selected Land Use Register",
           "opacity": 1,
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SelectedLandUseRegister/MapServer",
-          "secure": "false"
+          "secure": "false",
+          "legend": "false"
         }
       ]
     }
   ],
   "showIntersectLayers": false,
   "downloadDataIntersectLayers": false,
+  "showReportQuality": "true",
   "defaultReportQuality": "medium"
 }

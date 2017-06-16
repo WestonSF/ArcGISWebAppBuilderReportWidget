@@ -159,10 +159,14 @@ SimpleLineSymbol) {
           var json = [];
           var len = this.config.maps.length;
           for (var a = 0; a < len; a++) {
-              json.push({
-                  map: this.config.maps[a].title,
-                  scale: this.config.maps[a].scale
-              });
+              // If no parent map is defined
+              if (!this.config.maps[a].parentMap) {
+                  // Push map into list
+                  json.push({
+                      map: this.config.maps[a].title,
+                      scale: this.config.maps[a].scale
+                  });
+              }
           }
           this.mapTable.addRows(json);
       }
@@ -184,7 +188,12 @@ SimpleLineSymbol) {
           "quality": 300
       }]
 
-      // Load in report quality options to dropdown
+      //Show report quality table if needed
+      if (String(this.config.showReportQuality).toLowerCase() == "true") {
+          html.setStyle(this.reportQualityTable, "display", "block");
+      }
+
+
       var len = reportQuality.length;
       for (var a = 0; a < len; a++) {
           var option = {
@@ -205,6 +214,10 @@ SimpleLineSymbol) {
 
           // Load data download options
           dataOptions = [
+          {
+              "label": "None",
+              "value": "None"
+          },
           {
               "label": "CSV",
               "value": "CSV"
@@ -228,7 +241,7 @@ SimpleLineSymbol) {
               this.dataDownloadFormatSelect.addOption(option);
           }
           // Set the default option
-          this.dataDownloadFormatSelect.set("value", "CSV");
+          this.dataDownloadFormatSelect.set("value", "None");
       }
     },
 
@@ -418,14 +431,15 @@ SimpleLineSymbol) {
               // If a point
               if (mapFrame.selectedGeometry.type.toLowerCase() == "point") {
                   // Factor for converting point to extent 
-                  var factor = 20;
+                  var factor = 50;
                   var extent = new esri.geometry.Extent(mapFrame.selectedGeometry.x - factor, mapFrame.selectedGeometry.y - factor, mapFrame.selectedGeometry.x + factor, mapFrame.selectedGeometry.y + factor, mapFrame.map.spatialReference);
               }
               else {
                   // Centre map on the feature
                   var extent = mapFrame.selectedGeometry.getExtent();
               }
-              map.setExtent(extent.expand(1.5));
+              // Expand extent out
+              map.setExtent(extent.expand(2));
 
               // After extent has been changed - Pan and zoom events
               panEndHandler = map.on("pan-end", analyseMaps);
@@ -455,6 +469,9 @@ SimpleLineSymbol) {
                 outFields: []
             });
             mapFrame.reportFeatureLayer.id = "ReportLayer";
+            // Set the minimum scale
+            mapFrame.reportFeatureLayer.minScale = 20000;
+            // Add layer to map
             map.addLayer(mapFrame.reportFeatureLayer);
             initSelectionLayer(url);
         }
@@ -691,12 +708,28 @@ SimpleLineSymbol) {
               if (String(userMap.include).toLowerCase() == "true") {
                   // Push into array
                   mapsInclude.push(userMap);
+
+                  // For each of the maps from the config
+                  var configMaps = mapFrame.config.maps;
+                  array.forEach(configMaps, function (configMap) {
+                      // If parent map is defined
+                      if (configMap.parentMap) {
+                          // If it is the current map
+                          if (userMap.map == configMap.parentMap) {
+                              // Add to maps to include array
+                              var childMap = {};
+                              childMap.include = true;
+                              childMap.map = configMap.title;
+                              childMap.scale = "";
+                              mapsInclude.push(childMap);
+                          }
+                      }
+                  });
               }
           });
 
-          // For each of the maps from the config
-          var configMaps = mapFrame.config.maps;
           var mapsAnalyse = [];
+          var configMaps = mapFrame.config.maps;
           array.forEach(configMaps, function (configMap) {
               // For each of the maps to include
               array.forEach(mapsInclude, function (mapInclude) {
@@ -744,40 +777,69 @@ SimpleLineSymbol) {
               var layerQueries = [];
               var mapLayerQueries = [];
               var mapLayerQueryURLs = [];
-              // For each of the results
+              // For each of the maps
               array.forEach(mapsAnalyse, function (mapAnalyse) {
-                  // Split the URL
-                  var urlSplit = mapAnalyse.intersectLayer.split("/");
-                  // If the last character is not a number, then must be a map service
-                  if (isNaN(urlSplit[urlSplit.length - 1])) {
-                      // Setup the query to get layers from a map service
-                      var layersRequest = esriRequest({
-                          url: mapAnalyse.intersectLayer + "/layers",
-                          content: { f: "json" },
-                          handleAs: "json",
-                          callbackParamName: "callback"
-                      });
-                      layerQueries.push(layersRequest);
-                      mapLayerQueries.push(mapAnalyse);
-                  }
-                  else {
-                      // Set the URL
-                      var url = mapAnalyse.intersectLayer;            
+                  // If there is a comma in the string - multiple intersect layers
+                  if (mapAnalyse.intersectLayer.indexOf(",") > 0) {
+                      // Push the intersect layers into an array
+                      var intersectLayers = mapAnalyse.intersectLayer.split(',');
+                      // For each of the intersect layers
+                      array.forEach(intersectLayers, function (intersectLayer) {
+                          // Set the URL
+                          var url = intersectLayer;
 
-                      // Setup the query parameters
-                      var queryTask = new QueryTask(url);
-                      // If doing a buffer
-                      if ((mapAnalyse.bufferDistance) && (Number(mapAnalyse.bufferDistance) > 0)) {
-                          query.distance = mapAnalyse.bufferDistance;
+                          // Setup the query parameters
+                          var queryTask = new QueryTask(url);
+                          // If doing a buffer
+                          if ((mapAnalyse.bufferDistance) && (Number(mapAnalyse.bufferDistance) > 0)) {
+                              query.distance = mapAnalyse.bufferDistance;
+                          }
+                          else {
+                              query.distance = "";
+                          }
+                          var executeQuery = queryTask.execute(query);
+                          // Push query to execute into array as well as the title
+                          intersectQueries.push(executeQuery);
+                          mapIntersectQueries.push(mapAnalyse);
+                          mapLayerQueryURLs.push(intersectLayer);
+
+                      });
+                  }
+                  // Single intersect layer
+                  else {
+                      // Split the URL
+                      var urlSplit = mapAnalyse.intersectLayer.split("/");
+                      // If the last character is not a number, then must be a map service
+                      if (isNaN(urlSplit[urlSplit.length - 1])) {
+                          // Setup the query to get layers from a map service
+                          var layersRequest = esriRequest({
+                              url: mapAnalyse.intersectLayer + "/layers",
+                              content: { f: "json" },
+                              handleAs: "json",
+                              callbackParamName: "callback"
+                          });
+                          layerQueries.push(layersRequest);
+                          mapLayerQueries.push(mapAnalyse);
                       }
                       else {
-                          query.distance = "";
+                          // Set the URL
+                          var url = mapAnalyse.intersectLayer;
+
+                          // Setup the query parameters
+                          var queryTask = new QueryTask(url);
+                          // If doing a buffer
+                          if ((mapAnalyse.bufferDistance) && (Number(mapAnalyse.bufferDistance) > 0)) {
+                              query.distance = mapAnalyse.bufferDistance;
+                          }
+                          else {
+                              query.distance = "";
+                          }
+                          var executeQuery = queryTask.execute(query);
+                          // Push query to execute into array as well as the title
+                          intersectQueries.push(executeQuery);
+                          mapIntersectQueries.push(mapAnalyse);
+                          mapLayerQueryURLs.push(mapAnalyse.intersectLayer);
                       }
-                      var executeQuery = queryTask.execute(query);
-                      // Push query to execute into array as well as the title
-                      intersectQueries.push(executeQuery);
-                      mapIntersectQueries.push(mapAnalyse);
-                      mapLayerQueryURLs.push(mapAnalyse.intersectLayer);
                   }
               });
 
@@ -874,23 +936,27 @@ SimpleLineSymbol) {
                         }
 
                         var features = result.features;
-                        // Set the symbology
-                        switch (features[0].geometry.type) {
-                            case "point":
-                                var symbol = new SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 26,
-                                new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-                                new dojo.Color([0, 0, 0]), 2),
-                                new dojo.Color(fillColours[count]));
-                                break;
-                            case "polyline":
-                                var symbol = new SimpleLineSymbol(esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-                                new dojo.Color(lineColours[count]), 3));
-                                break;
-                            case "polygon":
-                                var symbol = new SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-                                new esri.symbol.SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                                new dojo.Color(lineColours[count]), 3), new dojo.Color(fillColours[count]));
-                                break;
+
+                        // If showing intersect layers on the map
+                        if (String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") {
+                            // Set the symbology
+                            switch (features[0].geometry.type) {
+                                case "point":
+                                    var symbol = new SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 26,
+                                    new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                                    new dojo.Color([0, 0, 0]), 2),
+                                    new dojo.Color(fillColours[count]));
+                                    break;
+                                case "polyline":
+                                    var symbol = new SimpleLineSymbol(esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                                    new dojo.Color(lineColours[count]), 3));
+                                    break;
+                                case "polygon":
+                                    var symbol = new SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                                    new esri.symbol.SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+                                    new dojo.Color(lineColours[count]), 3), new dojo.Color(fillColours[count]));
+                                    break;
+                            }
                         }
 
                         // Add feature set to data
@@ -918,8 +984,8 @@ SimpleLineSymbol) {
                                     break;
                                 case "polygon":
                                     var newFieldArea = {}
-                                    newFieldArea.name = "AreaMetres";
-                                    newFieldArea.alias = "Area (Metres)";
+                                    newFieldArea.name = "Hectares";
+                                    newFieldArea.alias = "Hectares";
                                     newFieldArea.type = "esriFieldTypeDouble";
                                     result.fields.push(newFieldArea);
                                     var newFieldLength = {}
@@ -1000,9 +1066,9 @@ SimpleLineSymbol) {
                                                     var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
                                                 }
                                                 else {
-                                                    var geometryLength = 0.00;
+                                                    var geometryLength = 0.0000;
                                                 }
-                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(4);
                                             }
                                             break;
                                         case "polygon":
@@ -1014,15 +1080,15 @@ SimpleLineSymbol) {
                                                 // Update area and length
                                                 if (clippedGeometry) {
                                                     feature.geometry.type = "polygon";
-                                                    var geometryArea = geometryEngine.planarArea(clippedGeometry, "square-meters");
+                                                    var geometryArea = geometryEngine.planarArea(clippedGeometry, "hectares");
                                                     var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
                                                 }
                                                 else {
-                                                    var geometryArea = 0.00;
-                                                    var geometryLength = 0.00;
+                                                    var geometryArea = 0.0000;
+                                                    var geometryLength = 0.0000;
                                                 }
-                                                feature.attributes.AreaMetres = parseFloat(geometryArea).toFixed(2);
-                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                                feature.attributes.Hectares = parseFloat(geometryArea).toFixed(4);
+                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(4);
                                             }
                                             break;
                                     }
@@ -1049,7 +1115,7 @@ SimpleLineSymbol) {
                             });
                             data.features = dataFeatures;
 
-                            if (String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+                            if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
                                 // Add the data download format and title
                                 data.downloadFormat = mapFrame.dataDownloadFormatSelect.value;
                                 data.title = mapIntersectQueries[count].title;
@@ -1062,8 +1128,9 @@ SimpleLineSymbol) {
                             featureLayer.applyEdits(featuresToAdd, null, null);
                             // Enable clear button
                             domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+
+                            downloadData.push(data);
                         }
-                        downloadData.push(data);
                     }  
                     count = count + 1;
                     // If at the final result
@@ -1091,6 +1158,23 @@ SimpleLineSymbol) {
               if (String(userMap.include).toLowerCase() == "true") {
                   // Push into array
                   mapsInclude.push(userMap);
+
+                  // For each of the maps from the config
+                  var configMaps = mapFrame.config.maps;
+                  array.forEach(configMaps, function (configMap) {
+                      // If parent map is defined
+                      if (configMap.parentMap) {
+                          // If it is the current map
+                          if (userMap.map == configMap.parentMap) {
+                              // Add to maps to include array
+                              var childMap = {};
+                              childMap.include = true;
+                              childMap.map = configMap.title;
+                              childMap.scale = "";
+                              mapsInclude.push(childMap);
+                          }
+                      }
+                  });
               }
           });
 
@@ -1113,13 +1197,14 @@ SimpleLineSymbol) {
                   }
               });
           });
+
           var reportJSON = JSON.stringify(report);
 
           // Get the report data JSON
           var reportDataJSON = JSON.stringify(reportData);
 
           // If download data is enabled
-          if (String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+          if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
               // Get the data download JSON
               var downloadDataJSON = JSON.stringify(downloadData);
           }
@@ -1196,7 +1281,7 @@ SimpleLineSymbol) {
               getReportEvent.remove();
 
               // Get the output data if needed
-              if (String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") {
+              if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
                   gpService.getResultData(result.jobInfo.jobId, "Output_Data");
                   getDataEvent = gpService.on("get-result-data-complete", function (outputData) {
                       console.log("Data located here - " + outputData.result.value.url + "...");

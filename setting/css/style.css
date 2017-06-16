@@ -33,16 +33,18 @@
   min-width: 100px;
 }
 
-.jimu-widget-report-setting .defaultreportquality-table {
-  margin-top: 10px;
+.jimu-widget-report-setting .reportquality-table {
+  padding-top:10px;
 }
 
-.jimu-widget-report-setting .defaultreportquality-table > tbody > tr > .first{
+.jimu-widget-report-setting .reportquality-table > tbody > tr > .first{
+  padding-top:10px;
   text-align: left;
   padding-right:15px;
   min-width: 50px;
 }
 
 .jimu-widget-report-setting .input-table > tbody > tr > .second{
+      padding-top:10px;
   width:650px;
 }

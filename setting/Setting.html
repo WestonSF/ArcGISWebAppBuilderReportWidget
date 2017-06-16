@@ -60,8 +60,15 @@
     </table>
 
 
-    <table class="defaultreportquality-table" cellspacing="0">
+    <table class="reportquality-table" cellspacing="0">
         <tbody>
+            <tr>
+                <td class="first">${nls.showReportQuality}</td>
+                <td class="second">
+                    <input data-dojo-attach-point="enableReportQuality"
+                           data-dojo-type="dijit/form/CheckBox" />
+                </td>
+            </tr>
             <tr>
                 <td class="first"><label data-dojo-attach-point="defaultReportQualityLabel">${nls.defaultReportQuality}:</label></td>
                 <td class="second"><select id="defaultReportQualitySelect" data-dojo-attach-point="defaultReportQualitySelect" data-dojo-type="dijit/form/Select"></select></td>

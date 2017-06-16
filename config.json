@@ -1,82 +1,107 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
-  "gpService": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
- "layers": [
+  "gpService": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "layers": [
     {
       "layerName": "Land Parcel",
       "serviceURL": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/0",
       "displayField": "appellation"
     }
   ],
-  "enableDraw": "true",
+  "enableDraw": true,
   "maps": [
     {
-      "type": "Report - Analysis",
-      "title": "Freshwater Fish Species - NZFFD",
+      "type": "Map",
+      "title": "Summary of Freshwater Fish Species Present",
       "scale": "",
-      "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/1",
+      "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/1,https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/2,https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/3",
       "bufferDistance": "",
-      "reportFields": "spfullname,catchname,org,AreaMetres,SpawnFdate,SpawnTdate",
+      "reportFields": "",
       "operationalLayers": [
-        {
-          "title": "Fish Spawning Habitats",
-          "opacity": "0.9",
-          "url": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer",
-          "visibleLayers": [1],
-          "secure": "false"
-        },
         {
           "title": "Non-Migratory Fish Habitats",
-          "opacity": "0.8",
+          "opacity": "0.9",
           "url": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer",
-          "visibleLayers": [3],
+          "visibleLayers": [
+            3
+          ],
           "secure": "false"
-        }
-      ]
-    },
-    {
-      "type": "Report - Analysis",
-      "title": "Freshwater Fish Species - Modelled",
-      "scale": "",
-      "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/2",
-      "bufferDistance": "",
-      "reportFields": "FishSpCode,gt50probab,NZREACH,AreaMetres",
-      "operationalLayers": [
+        },
         {
           "title": "Modelled Probability of over 50%",
           "opacity": "0.9",
           "url": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer",
-          "visibleLayers": [2],
+          "visibleLayers": [
+            2
+          ],
           "secure": "false"
         },
         {
-          "title": "Non-Migratory Fish Habitats",
-          "opacity": "0.8",
+          "title": "Fish Spawning Habitats",
+          "opacity": "0.9",
           "url": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer",
-          "visibleLayers": [3],
+          "visibleLayers": [
+            1
+          ],
           "secure": "false"
         }
       ]
     },
     {
+      "type": "Report",
+      "title": "Fish Spawning Habitats",
+      "parentMap": "Summary of Freshwater Fish Species Present",
+      "mergeTable":  "true",
+      "scale": "",
+      "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/1",
+      "bufferDistance": "",
+      "reportFields": "spfullname>Fish Species,Database Source=NZFFD,nzreach>NZREACH,Hectares,SpawnFdate>Spawn From Date,SpawnTdate>Spawn To Date",
+      "operationalLayers": []
+    },
+    {
+      "type": "Report",
+      "title": "Modelled Probability of over 50%",
+      "parentMap": "Summary of Freshwater Fish Species Present",
+      "mergeTable":  "true",
+      "scale": "",
+      "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/2",
+      "bufferDistance": "",
+      "reportFields": "FishSpCode>Fish Species,Database Source=Modelled,NZREACH,Hectares,Spawn From Date=NA,Spawn To Date=NA",
+      "operationalLayers": []
+    },
+    {
+      "type": "Report",
+      "title": "Non-Migratory Fish Habitats",
+      "parentMap": "Summary of Freshwater Fish Species Present",
+      "mergeTable":  "true",
+      "scale": "",
+      "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/3",
+      "bufferDistance": "",
+      "reportFields": "Species>Fish Species,Database Source=Non-Migratory,nzsegment>NZREACH,Hectares,Spawn From Date=NA,Spawn To Date=NA",
+      "operationalLayers": []
+    },
+    {
       "type": "Report - Analysis",
-      "title": "Erosion Susceptibility",
+      "title": "Summary of Erosion Susceptibility",
       "scale": "",
       "intersectLayer": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer/4",
       "bufferDistance": "",
-      "reportFields": "CODE,Descriptio,AreaMetres,ESC2017",
+      "reportFields": "CODE>Code,Descriptio>Description,Hectares,ESC2017",
       "operationalLayers": [
         {
           "title": "Erosion Susceptibility",
           "opacity": "0.8",
           "url": "https://maps.mpi.govt.nz/wss/service/ags-relay/arcgis1/guest/arcgis/rest/services/TERRESTRIAL/TERRESTRIAL_NationalEnvironmentalStandards/MapServer",
-          "visibleLayers": [4],
+          "visibleLayers": [
+            4
+          ],
           "secure": "false"
         }
       ]
     }
   ],
-  "showIntersectLayers": "true",
-  "downloadDataIntersectLayers": "true",
+  "showIntersectLayers": true,
+  "downloadDataIntersectLayers": true,
+  "showReportQuality": false,
   "defaultReportQuality": "medium"
 }

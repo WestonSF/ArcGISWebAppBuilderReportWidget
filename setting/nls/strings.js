@@ -13,6 +13,7 @@ define({
         ok: "OK",
         cancel: "Cancel",
         visible: "Visible",
+        legend: "Legend",
         selectLayers: "Selection Layers",
         mapsAvailable: "Maps Available",
         gpService: "Reporting Geoprocessing Service",
@@ -21,8 +22,10 @@ define({
         reportFields: "Report Fields",
         enableDrawTools: "Enable Drawing Tools",
         showIntersectLayers: "Show Intersect Layers on Map",
+        showReportQuality: "Show Report Quality",
         defaultReportQuality: "Default Report Quality",
         downloadDataIntersectLayers: "Download Data from Intersect Layers",
-        visibleLayers: "Visible Layers"
+        visibleLayers: "Visible Layers",
+        parentMap: "Parent Map"
   })
 });

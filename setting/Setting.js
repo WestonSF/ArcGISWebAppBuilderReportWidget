@@ -116,6 +116,13 @@ function (
             unique: false,
             editable: true
         }, {
+            name: 'parentMap',
+            title: this.nls.parentMap,
+            type: 'text',
+            width: '10%',
+            unique: false,
+            editable: true
+        }, {
             name: 'scale',
             title: this.nls.scale,
             type: 'text',
@@ -148,7 +155,7 @@ function (
             name: 'operationalLayers',
             title: this.nls.operationalLayers,
             type: 'actions',
-            width: '20%',
+            width: '10%',
             actions: ['edit'],
             'class': 'symbol'
         },
@@ -177,6 +184,7 @@ function (
                 json.push({
                     type: this.config.maps[a].type,
                     title: this.config.maps[a].title,
+                    parentMap: this.config.maps[a].parentMap,
                     scale: this.config.maps[a].scale,
                     intersectLayer: this.config.maps[a].intersectLayer,
                     bufferDistance: this.config.maps[a].bufferDistance,
@@ -200,6 +208,9 @@ function (
 
         // Set the download data option
         this.downloadDataIntersectLayers.set('checked', config.downloadDataIntersectLayers);
+
+        // Set the report quality option
+        this.enableReportQuality.set('checked', config.showReportQuality);
 
         // Report quality options
         reportQuality = [
@@ -242,7 +253,7 @@ function (
             name: 'title',
             title: this.nls.title,
             type: 'text',
-            width: '30%',
+            width: '20%',
             unique: false,
             editable: true
         }, {
@@ -273,7 +284,14 @@ function (
             width: '10%',
             unique: false,
             editable: true
-        },
+         }, {
+             name: 'legend',
+             title: this.nls.legend,
+             type: 'text',
+             width: '10%',
+             unique: false,
+             editable: true
+         },
         {
             name: '',
             title: '',
@@ -310,7 +328,8 @@ function (
                             opacity: this.config.maps[a].operationalLayers[b].opacity,
                             url: this.config.maps[a].operationalLayers[b].url,
                             visibleLayers: this.config.maps[a].operationalLayers[b].visibleLayers,
-                            secure: this.config.maps[a].operationalLayers[b].secure
+                            secure: this.config.maps[a].operationalLayers[b].secure,
+                            legend: this.config.maps[a].operationalLayers[b].legend,
                         });
                     }
                 }
@@ -399,6 +418,9 @@ function (
 
         // Get the download data option
         this.config.downloadDataIntersectLayers = this.downloadDataIntersectLayers.checked;
+
+        // Get the report quality option
+        this.config.showReportQuality = this.enableReportQuality.checked;
 
         // Report quality options
         reportQuality = [
