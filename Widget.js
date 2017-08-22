@@ -188,7 +188,7 @@ SimpleLineSymbol) {
           "quality": 300
       }]
 
-      //Show report quality table if needed
+      // Show report quality table if needed
       if (String(this.config.showReportQuality).toLowerCase() == "true") {
           html.setStyle(this.reportQualityTable, "display", "block");
       }
@@ -894,8 +894,8 @@ SimpleLineSymbol) {
 
           all(intersectQueries).then(function (results) {
               // Set up array of colours
-              var fillColours = [[255,255,0,0.3],[255,0,0,0.3],[0,0,255,0.3],[0,255,0,0.3],[255,0,128,0.3],[255,128,0,0.3],[192,192,192,0.3],[128,255,128,0.3],[255,128,128,0.3],[255,128,255,0.3]]
-              var lineColours = [[255,255,0],[255,0,0],[0,0,255],[0,255,0],[255,0,128],[255,128,0],[192,192,192],[128,255,128],[255,128,128],[255,128,255]]
+              var fillColours = [[255,255,0,0.3],[255,0,0,0.3],[0,0,255,0.3],[0,255,0,0.3],[255,0,128,0.3],[255,128,0,0.3],[192,192,192,0.3],[128,255,128,0.3],[255,128,128,0.3],[255,128,255,0.3],[128,0,255,0.3],[0,0,64,0.3]]
+              var lineColours = [[255,255,0],[255,0,0],[0,0,255],[0,255,0],[255,0,128],[255,128,0],[192,192,192],[128,255,128],[255,128,128],[255,128,255],[128,0,255],[0,0,64]]
               // For each of the results
               var count = 0;
               array.forEach(results, function (result) {
@@ -918,7 +918,7 @@ SimpleLineSymbol) {
                         data.spatialReference = result.spatialReference;        
 
                         // Delete un-needed fields
-                        var deleteFields = ["OBJECTID","OBJECTID_","SHAPE.STArea()","SHAPE.STLength()","Shape.STArea()", "Shape.STLength()"];
+                        var deleteFields = ["OBJECTID","OBJECTID_","SHAPE.STArea()","SHAPE.STLength()","Shape.STArea()","Shape.STLength()","Shape__Area","Shape__Length"];
                         var fieldsLength = result.fields.length;
                         var fieldsToDelete = [];
                         // For each of the fields
@@ -1022,7 +1022,7 @@ SimpleLineSymbol) {
                             var content = "";
                             array.forEach(result.fields, function (field) {
                                 // If field is in the report fields configuration
-                                if (mapIntersectQueries[count].reportFields.includes(field['name'])) {
+                                if (mapIntersectQueries[count].reportFields.indexOf(field['name']) !== -1) {
                                     content = content + field['alias'] + ": ${" + field['name'] + "} <br/>";
                                 }
                             });
