@@ -75,6 +75,9 @@ SimpleLineSymbol) {
     // Currently selected feature
     selectedFeatureJSON: null,
     selectedGeometry: null,
+    // Download URLs
+    reportDownloadLink: null,
+    dataDownloadLink: null,
 
     // EVENT FUNCTION - Creation of widget
     postCreate: function () {
@@ -86,8 +89,11 @@ SimpleLineSymbol) {
       domClass.add(this.submitButton, 'jimu-state-disabled');
       // Initially disable clear button
       domClass.add(this.clearButton, 'jimu-state-disabled');
-        // Initially disable cancel button
+      // Initially disable cancel button
       domClass.add(this.cancelButton, 'jimu-state-disabled');
+      // Initially Disable download buttons
+      domClass.add(mapFrame.reportDownloadButton, 'jimu-state-disabled');
+      domClass.add(mapFrame.dataDownloadButton, 'jimu-state-disabled');
 
       // Load in layers to dropdown
       var len = this.config.layers.length;
@@ -261,7 +267,7 @@ SimpleLineSymbol) {
       var gpService = null;
       var reportGenerating = false;
       var gpServiceJobId = null;
-
+      
       // On map table row click
       this.mapTable.on("row-click", function () {
           var allCheckboxes = mapFrame.mapTable._getAllEnabledTdCheckBoxes("include");
@@ -395,6 +401,9 @@ SimpleLineSymbol) {
                   domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
                   // Disable cancel button
                   domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+                  // Disable download buttons
+                  domClass.add(mapFrame.reportDownloadButton, 'jimu-state-disabled');
+                  domClass.add(mapFrame.dataDownloadButton, 'jimu-state-disabled');
                   // Hide loading
                   reportGenerating = false;
                   html.setStyle(mapFrame.loading, "display", "none");
@@ -1280,11 +1289,16 @@ SimpleLineSymbol) {
           // Get the output report
           gpService.getResultData(result.jobInfo.jobId, "Output_File");
           getReportEvent = gpService.on("get-result-data-complete", function (outputReport) {
+              // Get report download link
+              reportDownloadLink = outputReport.result.value.url;
+              // Enable report download button
+              domClass.remove(mapFrame.reportDownloadButton, 'jimu-state-disabled');
+
               mapFrame.loadingInfo.innerHTML = "Report generation complete...";
               console.log("Report geoprocessing service job finished...");
-              console.log("PDF located here - " + outputReport.result.value.url + "...");
+              console.log("PDF located here - " + reportDownloadLink + "...");
               // Open the PDF
-              window.open(outputReport.result.value.url);
+              window.open(reportDownloadLink);
               console.timeEnd('Complete Geoprocessing Service');
               getReportEvent.remove();
 
@@ -1292,9 +1306,14 @@ SimpleLineSymbol) {
               if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
                   gpService.getResultData(result.jobInfo.jobId, "Output_Data");
                   getDataEvent = gpService.on("get-result-data-complete", function (outputData) {
-                      console.log("Data located here - " + outputData.result.value.url + "...");
+                      // Get data download link
+                      dataDownloadLink = outputData.result.value.url;
+                      // Enable data download button
+                      domClass.remove(mapFrame.dataDownloadButton, 'jimu-state-disabled');
+
+                      console.log("Data located here - " + dataDownloadLink + "...");
                       // Download the data
-                      window.open(outputData.result.value.url);
+                      window.open(dataDownloadLink);
                       getDataEvent.remove();
                   });
               }
@@ -1307,11 +1326,28 @@ SimpleLineSymbol) {
           domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
           // Disable cancel button
           domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+
           // Hide loading
           reportGenerating = false;
           html.setStyle(mapFrame.loading, "display", "none");
           mapFrame.loadingInfo.innerHTML = "Loading...";
       }
+
+      // EVENT FUNCTION - Report download button click
+      on(this.reportDownloadButton, 'click', lang.hitch(this, function (evt) {
+          // Open the PDF
+          if (reportDownloadLink) {
+              window.open(reportDownloadLink);
+          }
+      }));
+
+      // EVENT FUNCTION - Data download button click
+      on(this.dataDownloadButton, 'click', lang.hitch(this, function (evt) {
+          // Download the data
+          if (dataDownloadLink) {
+              window.open(dataDownloadLink);
+          }
+      }));
 
       // FUNCTION - Error from GP service
       function gpError(error) {
@@ -1330,6 +1366,9 @@ SimpleLineSymbol) {
           domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
           // Disable cancel button
           domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+          // Disable download buttons
+          domClass.add(mapFrame.reportDownloadButton, 'jimu-state-disabled');
+          domClass.add(mapFrame.dataDownloadButton, 'jimu-state-disabled');
           // Hide loading
           reportGenerating = false;
           html.setStyle(mapFrame.loading, "display", "none");
