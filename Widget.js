@@ -967,12 +967,20 @@ SimpleLineSymbol) {
                         array.forEach(features, function (feature) {
                             reportAttributes.push(feature.attributes);
                         });
-                        reportFeatures.features = reportAttributes;
-                        reportFeatures.fields = result.fields;
+                        // If being used in a report
+                        if ((mapIntersectQueries[count].type.toLowerCase() == "report") || (mapIntersectQueries[count].type.toLowerCase() == "report - analysis")) {
+                            reportFeatures.features = reportAttributes;
+                            reportFeatures.fields = result.fields;
+                        }
+                        else {
+                            reportFeatures.features = [];
+                            reportFeatures.fields = [];
+                        }
                         reportData.push(reportFeatures);
 
+
                         // If showing intersect layers on the map
-                        if (String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") {
+                        if ((String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") && (String(mapIntersectQueries[count].showIntersectLayer).toLowerCase() == "true")) {
                             // Add in area and length fields
                             switch (features[0].geometry.type) {
                                 case "polyline":
