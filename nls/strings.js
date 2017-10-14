@@ -12,6 +12,9 @@ define({
      multipleSelection: "Select Multiple Features",
      multipleFeatures: "Multiple Features Returned",
      reportQuality: "Report Quality",
-     dataDownloadFormat: "Data Format for Download"
+     dataDownloadFormat: "Data Format for Download",
+     downloadReport: "Download Report",
+     downloadData: "Download Data",
+     scaleSet: "Automatically Set Scale for Maps",
   })
 });

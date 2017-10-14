@@ -23,6 +23,7 @@ define(["dojo/_base/declare",
 "esri/layers/FeatureLayer",
 "esri/layers/GraphicsLayer",
 "esri/renderers/SimpleRenderer",
+"esri/geometry/scaleUtils",
 "esri/graphicsUtils",
 "esri/graphic",
 "esri/InfoTemplate",
@@ -56,6 +57,7 @@ Query,
 FeatureLayer,
 GraphicsLayer,
 SimpleRenderer,
+scaleUtils,
 graphicsUtils,
 Graphic,
 InfoTemplate,
@@ -263,6 +265,7 @@ SimpleLineSymbol) {
       var selectionEvent = null;
       var featureSelectionEvent = null;
       var gpErrorEvent = null;
+      var setMapScaleEvent = null;
       // Report Geoprocessing service
       var gpService = null;
       var reportGenerating = false;
@@ -360,6 +363,15 @@ SimpleLineSymbol) {
           });
       }
 
+      // Set the current scale for the maps
+      dijit.byId("scaleSetSelection").set("checked", true);
+      setMapsScale();
+      // EVENT FUNCTION - When extent is changed on the map
+      setMapScaleEvent = on(map, 'extent-change', lang.hitch(this, function (evt) {
+          // Set the current scale for the maps
+          setMapsScale();
+      }));
+
       // EVENT FUNCTION - Clear button click
       on(this.clearButton, 'click', lang.hitch(this, function (evt) {
           // Clear info window
@@ -448,7 +460,7 @@ SimpleLineSymbol) {
                   var extent = mapFrame.selectedGeometry.getExtent();
               }
               // Expand extent out
-              map.setExtent(extent.expand(2));
+              map.setExtent(extent.expand(3));
 
               // After extent has been changed - Pan and zoom events
               panEndHandler = map.on("pan-end", analyseMaps);
@@ -484,6 +496,28 @@ SimpleLineSymbol) {
             map.addLayer(mapFrame.reportFeatureLayer);
             initSelectionLayer(url);
         }
+      }
+
+      // FUNCTION - Set current scale for the maps
+      function setMapsScale() {
+          // If automatically set scale option is checked
+          var setScaleSelection = dijit.byId("scaleSetSelection").checked;
+          if (setScaleSelection == true) {
+              // Get the current scale of the map
+              var scale = scaleUtils.getScale(map);
+
+              // Get the rows in the maps table
+              var rows = mapFrame.mapTable.getRows();
+              // For each row (map)
+              array.forEach(rows, function (row) {
+                  // Get the data for the row
+                  var rowData = mapFrame.mapTable.getRowData(row)
+
+                  // Update the row data with the current scale
+                  rowData.scale = scale;
+                  mapFrame.mapTable.editRow(row, rowData);
+              });
+          }
       }
 
       // FUNCTION - Initialise the selection layer

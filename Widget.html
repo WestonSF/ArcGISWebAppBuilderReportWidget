@@ -42,6 +42,18 @@
     </table>
 
     <p class="separator"><B>${nls.mapsProduce}</B></p>
+
+    <table class="scaleSet-table" data-dojo-attach-point="scaleSetTable">
+        <tbody>
+            <tr>
+                <td class="first">${nls.scaleSet}:</td>
+                <td class="second">
+                    <input id="scaleSetSelection" data-dojo-attach-point="scaleSetSelection" data-dojo-type="dijit/form/CheckBox" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     <div data-dojo-attach-point="mapsTable"></div>
 
     <table class="reportquality-table" data-dojo-attach-point="reportQualityTable" cellspacing="0" style="display:none;">

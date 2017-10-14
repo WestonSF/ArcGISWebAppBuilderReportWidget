@@ -27,6 +27,12 @@
   min-width: 50px;
 }
 
+.jimu-widget-report .scaleSet-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
 .jimu-widget-report .multiplefeatures-table > tbody > tr > .first{
   text-align: left;
   padding-right:15px;
