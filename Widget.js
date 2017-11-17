@@ -141,14 +141,14 @@ SimpleLineSymbol) {
           name: 'map',
           title: this.nls.map,
           type: 'text',
-          width: '70%',
+          width: '65%',
           unique: false,
           editable: false
       }, {
           name: 'scale',
           title: this.nls.scale,
           type: 'text',
-          width: '20%',
+          width: '25%',
           unique: false,
           editable: true
       }
@@ -514,7 +514,7 @@ SimpleLineSymbol) {
                   var rowData = mapFrame.mapTable.getRowData(row)
 
                   // Update the row data with the current scale
-                  rowData.scale = scale;
+                  rowData.scale = Math.round(scale);
                   mapFrame.mapTable.editRow(row, rowData);
               });
           }
