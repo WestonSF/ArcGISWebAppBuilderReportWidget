@@ -431,6 +431,9 @@ SimpleLineSymbol) {
       var reportData = [];
       var downloadData = [];
       connect.connect(this.submitButton, 'click', lang.hitch(this, function (evt) {
+          // Clear info window
+          mapFrame.map.infoWindow.hide();
+
           // Remove any analysis feature layers from the map
           mapFrame.removeAnalysisFeatureLayers();
 
@@ -454,13 +457,35 @@ SimpleLineSymbol) {
                   // Factor for converting point to extent 
                   var factor = 50;
                   var extent = new esri.geometry.Extent(mapFrame.selectedGeometry.x - factor, mapFrame.selectedGeometry.y - factor, mapFrame.selectedGeometry.x + factor, mapFrame.selectedGeometry.y + factor, mapFrame.map.spatialReference);
+                  // Expand extent out
+                  map.setExtent(extent.expand(3));
               }
+              // If a polyline
+              else if (mapFrame.selectedGeometry.type.toLowerCase() == "polyline") {
+                  // Centre map on the feature
+                  var extent = mapFrame.selectedGeometry.getExtent();
+                  // Expand extent out
+                  map.setExtent(extent.expand(2));
+              }
+              // Else polygon
               else {
                   // Centre map on the feature
                   var extent = mapFrame.selectedGeometry.getExtent();
+                  // Get area of polygon
+                  var geometryArea = geometryEngine.planarArea(mapFrame.selectedGeometry, "square-meters");
+                  if (geometryArea < 10000) {
+                      // Expand extent out
+                      map.setExtent(extent.expand(1.5));
+                  }
+                  else if (geometryArea < 30000) {
+                      // Expand extent out
+                      map.setExtent(extent.expand(2));
+                  }
+                  else {
+                      // Expand extent out
+                      map.setExtent(extent.expand(3));
+                  }
               }
-              // Expand extent out
-              map.setExtent(extent.expand(3));
 
               // After extent has been changed - Pan and zoom events
               panEndHandler = map.on("pan-end", analyseMaps);
@@ -514,7 +539,7 @@ SimpleLineSymbol) {
                   var rowData = mapFrame.mapTable.getRowData(row)
 
                   // Update the row data with the current scale
-                  rowData.scale = Math.round(scale);
+                  rowData.scale = scale;
                   mapFrame.mapTable.editRow(row, rowData);
               });
           }
@@ -572,6 +597,7 @@ SimpleLineSymbol) {
             mapFrame.loadingInfo.innerHTML = "Loading...";
             // Enable clear button
             domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+
             // Set the symbology
             switch (mapFrame.selectionFeatureLayer.geometryType) {
                 case "esriGeometryPoint":
