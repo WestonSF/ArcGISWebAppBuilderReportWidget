@@ -244,6 +244,24 @@ function (
         });    
     },
 
+    // FUNCTION - When add selection layer button is clicked
+    onSelectAddClick: function () {
+        console.log("Adding selection layer...")
+        // Add new row to table for editing
+        var result = this.layerTable.addRow({});
+        if (result.success && result.tr) {
+        }
+    },
+
+    // FUNCTION - When add map button is clicked
+    onMapAddClick: function () {
+        console.log("Adding map...")
+        // Add new row to table for editing
+        var result = this.mapTable.addRow({});
+        if (result.success && result.tr) {
+        }
+    },
+
     // FUNCTION - When edit layers button is clicked
     editLayersClick: function (tr) {
         console.log("Editing operational layers...")

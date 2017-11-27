@@ -15,6 +15,6 @@ define({
      dataDownloadFormat: "Data Format for Download",
      downloadReport: "Download Report",
      downloadData: "Download Data",
-     scaleSet: "Automatically Set Scale for Maps",
+     currentScale: "Current Scale",
   })
 });

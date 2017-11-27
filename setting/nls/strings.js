@@ -26,6 +26,8 @@ define({
         defaultReportQuality: "Default Report Quality",
         downloadDataIntersectLayers: "Download Data from Intersect Layers",
         visibleLayers: "Visible Layers",
-        parentMap: "Parent Map"
+        parentMap: "Parent Map",
+        addSelectLayer: "Add Selection Layer",
+        addMap: "Add Map"
   })
 });

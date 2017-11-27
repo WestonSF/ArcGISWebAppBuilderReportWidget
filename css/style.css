@@ -29,7 +29,7 @@
 
 .jimu-widget-report .scaleSet-table > tbody > tr > .first{
   text-align: left;
-  padding-right:15px;
+  padding-right:5px;
   min-width: 50px;
 }
 
@@ -95,9 +95,14 @@
   width:200px;
 }
 
-.jimu-widget-report .featureSelected{
+.jimu-widget-report .featureSelected-table{
   font-size: 16px;
   font-weight: bold;
+}
+
+.jimu-widget-report .scaleSet-table{
+  font-size: 12px;
+  font-style: italic;
 }
 
 .jimu-widget-report .description{

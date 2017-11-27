@@ -33,10 +33,10 @@
         </tbody>
     </table>
 
-    <table data-dojo-attach-point="featureSelectedTable">
+    <table class="featureSelected-table" data-dojo-attach-point="featureSelectedTable">
         <tbody>
             <tr>
-                <td class="first"><div class="featureSelected" data-dojo-attach-point="featureSelected"></div></td>
+                <td class="first"><div data-dojo-attach-point="featureSelected"></div></td>
             </tr>
         </tbody>
     </table>
@@ -46,13 +46,14 @@
     <table class="scaleSet-table" data-dojo-attach-point="scaleSetTable">
         <tbody>
             <tr>
-                <td class="first">${nls.scaleSet}:</td>
+                <td class="first">${nls.currentScale}:</td>
                 <td class="second">
-                    <input id="scaleSetSelection" data-dojo-attach-point="scaleSetSelection" data-dojo-type="dijit/form/CheckBox" />
+                    <div data-dojo-attach-point="currentScale"></div>
                 </td>
             </tr>
         </tbody>
     </table>
+
 
     <div data-dojo-attach-point="mapsTable"></div>
 

@@ -69,6 +69,7 @@ SimpleLineSymbol) {
   return declare([BaseWidget, _WidgetsInTemplateMixin], {
     baseClass: 'jimu-widget-report',  
     widgetState: null,
+    reportGenerating: false,
     // Graphic and feature layers
     graphicLayers: [], // Graphic selection layers that have been added to the map to show the feature(s) that is/are selected
     analysisfeatureLayers: [], // Analysis feature layers added to the map for querying/identifying
@@ -85,7 +86,7 @@ SimpleLineSymbol) {
     postCreate: function () {
       console.log('Report widget created...');
       this.inherited(arguments);
-      var mapFrame = this;
+      var self = this;
 
       // Initially disable submit button
       domClass.add(this.submitButton, 'jimu-state-disabled');
@@ -94,8 +95,8 @@ SimpleLineSymbol) {
       // Initially disable cancel button
       domClass.add(this.cancelButton, 'jimu-state-disabled');
       // Initially Disable download buttons
-      domClass.add(mapFrame.reportDownloadButton, 'jimu-state-disabled');
-      domClass.add(mapFrame.dataDownloadButton, 'jimu-state-disabled');
+      domClass.add(self.reportDownloadButton, 'jimu-state-disabled');
+      domClass.add(self.dataDownloadButton, 'jimu-state-disabled');
 
       // Load in layers to dropdown
       var len = this.config.layers.length;
@@ -201,7 +202,6 @@ SimpleLineSymbol) {
           html.setStyle(this.reportQualityTable, "display", "block");
       }
 
-
       var len = reportQuality.length;
       for (var a = 0; a < len; a++) {
           var option = {
@@ -256,9 +256,9 @@ SimpleLineSymbol) {
     // EVENT FUNCTION - Startup widget
     startup: function () {
       console.log("Report widget started...");
-      widgetState = "Open";
+      this.widgetState = "Open";
       this.inherited(arguments);
-      var mapFrame = this;
+      var self = this;
       var map = this.map;
       // Event handlers
       var mapClickEvent = null;
@@ -273,7 +273,7 @@ SimpleLineSymbol) {
       
       // On map table row click
       this.mapTable.on("row-click", function () {
-          var allCheckboxes = mapFrame.mapTable._getAllEnabledTdCheckBoxes("include");
+          var allCheckboxes = self.mapTable._getAllEnabledTdCheckBoxes("include");
           // For each of the checkboxes
           var checked = 0;
           array.forEach(allCheckboxes, function (checkbox) {
@@ -285,13 +285,13 @@ SimpleLineSymbol) {
           // If no checkboxes are checked
           if (checked == 0) {
               // Disable submit button
-              domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
+              domClass.add(self.submitButton, 'jimu-state-disabled');
           }
           else {
               // If a feature has been selected
-              if (mapFrame.selectedFeatureJSON) {
+              if (self.selectedFeatureJSON) {
                   // Enable submit button
-                  domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+                  domClass.remove(self.submitButton, 'jimu-state-disabled');
               }
           }
       });
@@ -303,36 +303,36 @@ SimpleLineSymbol) {
       // EVENT FUNCTION - When selection dropdown is changed
       this.layerSelect.on("change", function () {
           // Clear info window
-          mapFrame.map.infoWindow.hide();
+          self.map.infoWindow.hide();
 
-          domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
-          mapFrame.featureSelected.innerHTML = "No features currently selected...";
-          mapFrame.selectedFeatureJSON = null;
-          mapFrame.selectedGeometry = null;
+          domClass.add(self.submitButton, 'jimu-state-disabled');
+          self.featureSelected.innerHTML = "No features currently selected...";
+          self.selectedFeatureJSON = null;
+          self.selectedGeometry = null;
 
           var selection = this.get("value");
           // If draw selected
-          if (selection.toLowerCase() == mapFrame.nls.draw.toLowerCase()) {
+          if (selection.toLowerCase() == self.nls.draw.toLowerCase()) {
               // Show drawing tools
-              html.setStyle(mapFrame.drawTools, "display", "block");
+              html.setStyle(self.drawTools, "display", "block");
               // Hide selection tool
-              html.setStyle(mapFrame.multipleSelectionTable, "display", "none");
+              html.setStyle(self.multipleSelectionTable, "display", "none");
               // Hide multiple features selection
               dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
-              html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
+              html.setStyle(self.multipleFeaturesTable, "display", "none");
               // Remove the report feature layer
               changeReportLayer(selection, "remove");
           }
           else {
               // Hide drawing tools
-              html.setStyle(mapFrame.drawTools, "display", "none");
+              html.setStyle(self.drawTools, "display", "none");
               // Hide selection tool
-              html.setStyle(mapFrame.multipleSelectionTable, "display", "block");
+              html.setStyle(self.multipleSelectionTable, "display", "block");
               // Show feature selection
-              html.setStyle(mapFrame.featureSelectedTable, "display", "block");
+              html.setStyle(self.featureSelectedTable, "display", "block");
               // Hide multiple features selection
               dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
-              html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
+              html.setStyle(self.multipleFeaturesTable, "display", "none");
               // Add the report feature layer
               changeReportLayer(selection, "add");
           }
@@ -344,54 +344,53 @@ SimpleLineSymbol) {
           this.drawBox.on("draw-end", function () {
               // Get JSON for the drawn feature
               var selectedFeature = {};
-              mapFrame.selectedGeometry = this.drawLayer.graphics[0].geometry;
+              self.selectedGeometry = this.drawLayer.graphics[0].geometry;
               selectedFeature.geometry = this.drawLayer.graphics[0].geometry;
               selectedFeature.attributes = this.drawLayer.graphics[0].attributes;
-              mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
+              self.selectedFeatureJSON = JSON.stringify(selectedFeature);
 
               // Enable submit button
-              domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+              domClass.remove(self.submitButton, 'jimu-state-disabled');
           });
           // On clear graphics handler
           this.drawBox.on("clear", function () {
               // Reset selection
-              mapFrame.map.infoWindow.hide();
-              domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
-              mapFrame.featureSelected.innerHTML = "No features currently selected...";
-              mapFrame.selectedFeatureJSON = null;
-              mapFrame.selectedGeometry = null;
+              self.map.infoWindow.hide();
+              domClass.add(self.submitButton, 'jimu-state-disabled');
+              self.featureSelected.innerHTML = "No features currently selected...";
+              self.selectedFeatureJSON = null;
+              self.selectedGeometry = null;
           });
       }
 
-      // Set the current scale for the maps
-      dijit.byId("scaleSetSelection").set("checked", true);
-      setMapsScale();
+      // Set the current scale of the map
+      self.setMapsScale();
       // EVENT FUNCTION - When extent is changed on the map
       setMapScaleEvent = on(map, 'extent-change', lang.hitch(this, function (evt) {
-          // Set the current scale for the maps
-          setMapsScale();
+          // Set the current scale of the map
+          self.setMapsScale();
       }));
 
       // EVENT FUNCTION - Clear button click
       on(this.clearButton, 'click', lang.hitch(this, function (evt) {
           // Clear info window
-          mapFrame.map.infoWindow.hide();
+          self.map.infoWindow.hide();
 
-          domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
-          mapFrame.featureSelected.innerHTML = "No features currently selected...";
-          mapFrame.selectedFeatureJSON = null;
-          mapFrame.selectedGeometry = null;
+          domClass.add(self.submitButton, 'jimu-state-disabled');
+          self.featureSelected.innerHTML = "No features currently selected...";
+          self.selectedFeatureJSON = null;
+          self.selectedGeometry = null;
           // Hide multiple features selection
           dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
-          html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
+          html.setStyle(self.multipleFeaturesTable, "display", "none");
 
           // Clear selection graphics
-          mapFrame.clearSelectionGraphics();
+          self.clearSelectionGraphics();
           // Remove any analysis feature layers from the map
-          mapFrame.removeAnalysisFeatureLayers();
+          self.removeAnalysisFeatureLayers();
 
           // Disable clear button
-          domClass.add(mapFrame.clearButton, 'jimu-state-disabled');
+          domClass.add(self.clearButton, 'jimu-state-disabled');
       }));
 
      // EVENT FUNCTION - Cancel button click
@@ -408,18 +407,18 @@ SimpleLineSymbol) {
                   }
 
                   // Enable submit button
-                  domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+                  domClass.remove(self.submitButton, 'jimu-state-disabled');
                   // Enable clear button
-                  domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+                  domClass.remove(self.clearButton, 'jimu-state-disabled');
                   // Disable cancel button
-                  domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+                  domClass.add(self.cancelButton, 'jimu-state-disabled');
                   // Disable download buttons
-                  domClass.add(mapFrame.reportDownloadButton, 'jimu-state-disabled');
-                  domClass.add(mapFrame.dataDownloadButton, 'jimu-state-disabled');
+                  domClass.add(self.reportDownloadButton, 'jimu-state-disabled');
+                  domClass.add(self.dataDownloadButton, 'jimu-state-disabled');
                   // Hide loading
                   reportGenerating = false;
-                  html.setStyle(mapFrame.loading, "display", "none");
-                  mapFrame.loadingInfo.innerHTML = "Loading...";
+                  html.setStyle(self.loading, "display", "none");
+                  self.loadingInfo.innerHTML = "Loading...";
               });
           }
       }));
@@ -432,47 +431,47 @@ SimpleLineSymbol) {
       var downloadData = [];
       connect.connect(this.submitButton, 'click', lang.hitch(this, function (evt) {
           // Clear info window
-          mapFrame.map.infoWindow.hide();
+          self.map.infoWindow.hide();
 
           // Remove any analysis feature layers from the map
-          mapFrame.removeAnalysisFeatureLayers();
+          self.removeAnalysisFeatureLayers();
 
           mapsProduce = [];
           reportData = [];
           downloadData = [];
 
           // If a feature has been selected
-          if (mapFrame.selectedFeatureJSON) {
+          if (self.selectedFeatureJSON) {
               // Disable submit button
-              domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
+              domClass.add(self.submitButton, 'jimu-state-disabled');
               // Disable clear button
-              domClass.add(mapFrame.clearButton, 'jimu-state-disabled');
+              domClass.add(self.clearButton, 'jimu-state-disabled');
 
               // Show loading
               reportGenerating = true;
-              html.setStyle(mapFrame.loading, "display", "block");
+              html.setStyle(self.loading, "display", "block");
 
               // If a point
-              if (mapFrame.selectedGeometry.type.toLowerCase() == "point") {
+              if (self.selectedGeometry.type.toLowerCase() == "point") {
                   // Factor for converting point to extent 
                   var factor = 50;
-                  var extent = new esri.geometry.Extent(mapFrame.selectedGeometry.x - factor, mapFrame.selectedGeometry.y - factor, mapFrame.selectedGeometry.x + factor, mapFrame.selectedGeometry.y + factor, mapFrame.map.spatialReference);
+                  var extent = new esri.geometry.Extent(self.selectedGeometry.x - factor, self.selectedGeometry.y - factor, self.selectedGeometry.x + factor, self.selectedGeometry.y + factor, self.map.spatialReference);
                   // Expand extent out
                   map.setExtent(extent.expand(3));
               }
               // If a polyline
-              else if (mapFrame.selectedGeometry.type.toLowerCase() == "polyline") {
+              else if (self.selectedGeometry.type.toLowerCase() == "polyline") {
                   // Centre map on the feature
-                  var extent = mapFrame.selectedGeometry.getExtent();
+                  var extent = self.selectedGeometry.getExtent();
                   // Expand extent out
                   map.setExtent(extent.expand(2));
               }
               // Else polygon
               else {
                   // Centre map on the feature
-                  var extent = mapFrame.selectedGeometry.getExtent();
+                  var extent = self.selectedGeometry.getExtent();
                   // Get area of polygon
-                  var geometryArea = geometryEngine.planarArea(mapFrame.selectedGeometry, "square-meters");
+                  var geometryArea = geometryEngine.planarArea(self.selectedGeometry, "square-meters");
                   if (geometryArea < 10000) {
                       // Expand extent out
                       map.setExtent(extent.expand(1.5));
@@ -496,53 +495,31 @@ SimpleLineSymbol) {
       // FUNCTION - Change the report layer showing on the map
       function changeReportLayer(url,addRemove) {
         // Remove existing feature layer if single selection
-          if (mapFrame.reportFeatureLayer) {
+          if (self.reportFeatureLayer) {
             // Clear selection graphics
-            mapFrame.clearSelectionGraphics();
+            self.clearSelectionGraphics();
             // Remove any analysis feature layers from the map
-            mapFrame.removeAnalysisFeatureLayers();
+            self.removeAnalysisFeatureLayers();
             // Remove feature layer
-            map.removeLayer(mapFrame.reportFeatureLayer);
-            mapFrame.reportFeatureLayer = null;
-            mapFrame.selectionFeatureLayer = null;
+            map.removeLayer(self.reportFeatureLayer);
+            self.reportFeatureLayer = null;
+            self.selectionFeatureLayer = null;
         }
 
         // If adding layer
         if (addRemove.toLowerCase() == "add") {
             // Add the feature layer to the map
-            mapFrame.reportFeatureLayer = new esri.layers.FeatureLayer(url, {
+            this.reportFeatureLayer = new esri.layers.FeatureLayer(url, {
                 mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
                 outFields: []
             });
-            mapFrame.reportFeatureLayer.id = "ReportLayer";
+            this.reportFeatureLayer.id = "ReportLayer";
             // Set the minimum scale
-            mapFrame.reportFeatureLayer.minScale = 20000;
+            this.reportFeatureLayer.minScale = 20000;
             // Add layer to map
-            map.addLayer(mapFrame.reportFeatureLayer);
+            map.addLayer(this.reportFeatureLayer);
             initSelectionLayer(url);
         }
-      }
-
-      // FUNCTION - Set current scale for the maps
-      function setMapsScale() {
-          // If automatically set scale option is checked
-          var setScaleSelection = dijit.byId("scaleSetSelection").checked;
-          if (setScaleSelection == true) {
-              // Get the current scale of the map
-              var scale = scaleUtils.getScale(map);
-
-              // Get the rows in the maps table
-              var rows = mapFrame.mapTable.getRows();
-              // For each row (map)
-              array.forEach(rows, function (row) {
-                  // Get the data for the row
-                  var rowData = mapFrame.mapTable.getRowData(row)
-
-                  // Update the row data with the current scale
-                  rowData.scale = scale;
-                  mapFrame.mapTable.editRow(row, rowData);
-              });
-          }
       }
 
       // FUNCTION - Initialise the selection layer
@@ -551,55 +528,33 @@ SimpleLineSymbol) {
           if (mapClickEvent) {
               mapClickEvent.remove();
           }
+
           // Disconnect selection handler
           if (selectionEvent) {
               selectionEvent.remove();
           }
 
           // Add the feature layer to the map
-          mapFrame.selectionFeatureLayer = new esri.layers.FeatureLayer(url, {
+          self.selectionFeatureLayer = new esri.layers.FeatureLayer(url, {
               mode: esri.layers.FeatureLayer.MODE_ONDEMAND,
               outFields: ["*"]
           });
 
           // EVENT FUNCTION - On map click
-          mapClickEvent = map.on("click", function (event) {
-              // If a report isn't already generating, draw is not selected and widget is open
-              if ((reportGenerating == false) && (mapFrame.layerSelect.value.toLowerCase() != "draw") && (widgetState.toLowerCase() == "open")) {
-                  // Get JSON for the current webmap
-                  var printTask = new PrintTask();
-                  var printParameters = new PrintParameters();
-                  var webmap = printTask._getPrintDefinition(map, printParameters);
-
-                  // Clear graphics if single select
-                  var multipleSelection = dijit.byId("multipleSelection").checked;
-                  if (multipleSelection == false) {
-                      // Clear selection graphics
-                      mapFrame.clearSelectionGraphics();
-                  }
-
-                  // Setup a query
-                  var selectQuery = new Query();
-                  // Get the map point and make a selection
-                  selectQuery.geometry = event.mapPoint;
-                  mapFrame.selectionFeatureLayer.selectFeatures(selectQuery,
-                            FeatureLayer.SELECTION_NEW);
-                  // Show loading
-                  html.setStyle(mapFrame.loading, "display", "block");
-                  mapFrame.loadingInfo.innerHTML = "Loading...";
-              }
-          });
+          mapClickEvent = map.on("click", lang.hitch(this, function (event) {
+            self.mapClick(event.mapPoint);
+          }));
 
           // EVENT FUNCTION - On feature layer selection complete
-          selectionEvent = mapFrame.selectionFeatureLayer.on("selection-complete", function (selection) {
+          selectionEvent = self.selectionFeatureLayer.on("selection-complete", function (selection) {
             // Hide loading
-            html.setStyle(mapFrame.loading, "display", "none");
-            mapFrame.loadingInfo.innerHTML = "Loading...";
+            html.setStyle(self.loading, "display", "none");
+            self.loadingInfo.innerHTML = "Loading...";
             // Enable clear button
-            domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+            domClass.remove(self.clearButton, 'jimu-state-disabled');
 
             // Set the symbology
-            switch (mapFrame.selectionFeatureLayer.geometryType) {
+            switch (self.selectionFeatureLayer.geometryType) {
                 case "esriGeometryPoint":
                     var symbol = new SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE, 26,
                     new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
@@ -621,7 +576,7 @@ SimpleLineSymbol) {
                 // Set symbology
                 feature.setSymbol(symbol);
                 // Add to global array and map
-                mapFrame.graphicLayers.push(feature);
+                self.graphicLayers.push(feature);
                 map.graphics.add(feature);
             });
             // Refresh graphics layer
@@ -639,35 +594,35 @@ SimpleLineSymbol) {
           }
 
           // If features are returned
-          if (mapFrame.graphicLayers.length > 0) {
+          if (self.graphicLayers.length > 0) {
               // Get the display field
-              reportLayer = mapFrame.layerSelect.value;
-              var len = mapFrame.config.layers.length;
+              reportLayer = self.layerSelect.value;
+              var len = self.config.layers.length;
               for (var a = 0; a < len; a++) {
-                  if (reportLayer.toLowerCase() == mapFrame.config.layers[a].serviceURL.toLowerCase()) {
-                      var displayField = mapFrame.config.layers[a].displayField;
+                  if (reportLayer.toLowerCase() == self.config.layers[a].serviceURL.toLowerCase()) {
+                      var displayField = self.config.layers[a].displayField;
                   }
               }
 
               // If multiple features returned
               var multipleSelection = dijit.byId("multipleSelection").checked;
-              if ((mapFrame.graphicLayers.length > 1) && (multipleSelection == false)) {
+              if ((self.graphicLayers.length > 1) && (multipleSelection == false)) {
                   // Show multiple features selection
-                  html.setStyle(mapFrame.multipleFeaturesTable, "display", "block");
+                  html.setStyle(self.multipleFeaturesTable, "display", "block");
 
 
                   dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
-                  var len = mapFrame.graphicLayers.length;
+                  var len = self.graphicLayers.length;
                   for (var a = 0; a < len; a++) {
                       var multipleFeaturesResult = {};
 
                       // Load in the features to the dropdown
                       var option = {
-                          graphic: mapFrame.graphicLayers[a],
-                          value: mapFrame.graphicLayers[a].attributes[displayField],
-                          label: mapFrame.graphicLayers[a].attributes[displayField]
+                          graphic: self.graphicLayers[a],
+                          value: self.graphicLayers[a].attributes[displayField],
+                          label: self.graphicLayers[a].attributes[displayField]
                       };
-                      mapFrame.multipleFeaturesSelect.addOption(option);
+                      self.multipleFeaturesSelect.addOption(option);
                   }
 
                   // Get the initial selection
@@ -677,29 +632,29 @@ SimpleLineSymbol) {
                           var selection = option.graphic;
                           // Get JSON for the selected feature
                           var selectedFeature = {};
-                          mapFrame.selectedGeometry = selection.geometry;
+                          self.selectedGeometry = selection.geometry;
                           selectedFeature.geometry = selection.geometry;
                           selectedFeature.attributes = selection.attributes;
-                          mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
+                          self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                           // Update the display text
-                          mapFrame.featureSelected.innerHTML = selectedFeature.attributes[displayField];
+                          self.featureSelected.innerHTML = selectedFeature.attributes[displayField];
                       }
                   });
 
                   // EVENT FUNCTION - When selected feature dropdown is changed
-                  featureSelectionEvent = mapFrame.multipleFeaturesSelect.on("change", function () {
+                  featureSelectionEvent = self.multipleFeaturesSelect.on("change", function () {
                       var selectForm = dijit.byId('multipleFeaturesSelect');
                       array.forEach(selectForm.options, function (option) {
                           if (option.selected == true) {
                               var selection = option.graphic;
                               // Get JSON for the selected feature
                               var selectedFeature = {};
-                              mapFrame.selectedGeometry = selection.geometry;
+                              self.selectedGeometry = selection.geometry;
                               selectedFeature.geometry = selection.geometry;
                               selectedFeature.attributes = selection.attributes;
-                              mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
+                              self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                               // Update the display text
-                              mapFrame.featureSelected.innerHTML = selectedFeature.attributes[displayField];
+                              self.featureSelected.innerHTML = selectedFeature.attributes[displayField];
                         }
                       });
                   })
@@ -707,39 +662,39 @@ SimpleLineSymbol) {
               else {
                   // Hide multiple features selection
                   dijit.byId('multipleFeaturesSelect').removeOption(dijit.byId('multipleFeaturesSelect').getOptions());
-                  html.setStyle(mapFrame.multipleFeaturesTable, "display", "none");
+                  html.setStyle(self.multipleFeaturesTable, "display", "none");
 
                   // For each of the graphics that have been selected
                   var graphicLayerCount = 1;
-                  array.forEach(mapFrame.graphicLayers, function (graphicLayer) {
+                  array.forEach(self.graphicLayers, function (graphicLayer) {
                       // Get JSON for the selected feature
                       var selectedFeature = {};
                       // Update the display text
                       if ((multipleSelection == true) && (graphicLayerCount > 1)) {
                           // Merge the geometry
-                          selectedFeature.geometry = geometryEngine.union([mapFrame.selectedGeometry, graphicLayer.geometry]);
-                          mapFrame.selectedGeometry = selectedFeature.geometry;
-                          mapFrame.featureSelected.innerHTML = "Multiple features currently selected...";
+                          selectedFeature.geometry = geometryEngine.union([self.selectedGeometry, graphicLayer.geometry]);
+                          self.selectedGeometry = selectedFeature.geometry;
+                          self.featureSelected.innerHTML = "Multiple features currently selected...";
                       }
                       else {
                           selectedFeature.geometry = graphicLayer.geometry;
-                          mapFrame.selectedGeometry = graphicLayer.geometry;
-                          mapFrame.featureSelected.innerHTML = graphicLayer.attributes[displayField];
+                          self.selectedGeometry = graphicLayer.geometry;
+                          self.featureSelected.innerHTML = graphicLayer.attributes[displayField];
                       }
                       selectedFeature.attributes = graphicLayer.attributes;
-                      mapFrame.selectedFeatureJSON = JSON.stringify(selectedFeature);
+                      self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                       graphicLayerCount = graphicLayerCount + 1;
                   });
               }
 
               // Enable submit button
-              domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+              domClass.remove(self.submitButton, 'jimu-state-disabled');
           }
           else {
-              mapFrame.featureSelected.innerHTML = "No features found for " + dijit.byId("layerSelect").get("displayedValue") + "...";
+              self.featureSelected.innerHTML = "No features found for " + dijit.byId("layerSelect").get("displayedValue") + "...";
 
               // Disable submit button
-              domClass.add(mapFrame.submitButton, 'jimu-state-disabled');
+              domClass.add(self.submitButton, 'jimu-state-disabled');
           }
       }
 
@@ -756,7 +711,7 @@ SimpleLineSymbol) {
 
           // Set the report quality
           webmap.exportOptions = {
-              "dpi": mapFrame.reportQualitySelect.value
+              "dpi": self.reportQualitySelect.value
           }
           webmap.layoutOptions = {
               "titleText": "",
@@ -769,7 +724,7 @@ SimpleLineSymbol) {
           webmapJSON = JSON.stringify(webmap);
 
           // Get the maps to include from the table
-          var userMaps = mapFrame.mapTable.getData();
+          var userMaps = self.mapTable.getData();
           var mapsInclude = [];
           // For each of the maps
           array.forEach(userMaps, function (userMap) {
@@ -779,7 +734,7 @@ SimpleLineSymbol) {
                   mapsInclude.push(userMap);
 
                   // For each of the maps from the config
-                  var configMaps = mapFrame.config.maps;
+                  var configMaps = self.config.maps;
                   array.forEach(configMaps, function (configMap) {
                       // If parent map is defined
                       if (configMap.parentMap) {
@@ -798,7 +753,7 @@ SimpleLineSymbol) {
           });
 
           var mapsAnalyse = [];
-          var configMaps = mapFrame.config.maps;
+          var configMaps = self.config.maps;
           array.forEach(configMaps, function (configMap) {
               // For each of the maps to include
               array.forEach(mapsInclude, function (mapInclude) {
@@ -830,10 +785,10 @@ SimpleLineSymbol) {
               query.where = "1=1";
               query.outFields = ["*"];
               query.units = "meters";
-              query.geometry = mapFrame.selectedGeometry;
+              query.geometry = self.selectedGeometry;
               query.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
               // If showing intersect layers on the map
-              if (String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") {
+              if (String(self.config.showIntersectLayers).toLowerCase() == "true") {
                   query.returnGeometry = true;
               }
               else {
@@ -958,7 +913,7 @@ SimpleLineSymbol) {
       // FUNCTION - Execute spatial queries
       function spatialQueries(intersectQueries, mapIntersectQueries, mapLayerQueryURLs) {
           // Execute all apatial queries
-          mapFrame.loadingInfo.innerHTML = "Querying layers...";
+          self.loadingInfo.innerHTML = "Querying layers...";
           console.log("Spatially querying services...");
 
           all(intersectQueries).then(function (results) {
@@ -1007,7 +962,7 @@ SimpleLineSymbol) {
                         var features = result.features;
 
                         // If showing intersect layers on the map
-                        if (String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") {
+                        if (String(self.config.showIntersectLayers).toLowerCase() == "true") {
                             // Set the symbology
                             switch (features[0].geometry.type) {
                                 case "point":
@@ -1049,7 +1004,7 @@ SimpleLineSymbol) {
 
 
                         // If showing intersect layers on the map
-                        if ((String(mapFrame.config.showIntersectLayers).toLowerCase() == "true") && (String(mapIntersectQueries[count].showIntersectLayer).toLowerCase() == "true")) {
+                        if ((String(self.config.showIntersectLayers).toLowerCase() == "true") && (String(mapIntersectQueries[count].showIntersectLayer).toLowerCase() == "true")) {
                             // Add in area and length fields
                             switch (features[0].geometry.type) {
                                 case "polyline":
@@ -1135,7 +1090,7 @@ SimpleLineSymbol) {
                                             // If not doing a buffer
                                             if ((!mapIntersectQueries[count].bufferDistance) || (Number(mapIntersectQueries[count].bufferDistance) == 0)) {
                                                 // Clip the geometry to the selection
-                                                var clippedGeometry = geometryEngine.intersect(mapFrame.selectedGeometry, feature.geometry);
+                                                var clippedGeometry = geometryEngine.intersect(self.selectedGeometry, feature.geometry);
                                                 feature.geometry = clippedGeometry;
                                                 // Update length
                                                 if (clippedGeometry) {
@@ -1152,7 +1107,7 @@ SimpleLineSymbol) {
                                             // If not doing a buffer
                                             if ((!mapIntersectQueries[count].bufferDistance) || (Number(mapIntersectQueries[count].bufferDistance) == 0)) {
                                                 // Clip the geometry to the selection
-                                                var clippedGeometry = geometryEngine.intersect(mapFrame.selectedGeometry, feature.geometry);
+                                                var clippedGeometry = geometryEngine.intersect(self.selectedGeometry, feature.geometry);
                                                 feature.geometry = clippedGeometry;
                                                 // Update area and length
                                                 if (clippedGeometry) {
@@ -1192,19 +1147,19 @@ SimpleLineSymbol) {
                             });
                             data.features = dataFeatures;
 
-                            if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
+                            if ((String(self.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(self.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
                                 // Add the data download format and title
-                                data.downloadFormat = mapFrame.dataDownloadFormatSelect.value;
+                                data.downloadFormat = self.dataDownloadFormatSelect.value;
                                 data.title = mapIntersectQueries[count].title;
                             }
 
                             // Add feature layer to the map and global array
-                            mapFrame.analysisfeatureLayers.push(featureLayer);
+                            self.analysisfeatureLayers.push(featureLayer);
                             map.addLayer(featureLayer);
                             // Add features to feature layer
                             featureLayer.applyEdits(featuresToAdd, null, null);
                             // Enable clear button
-                            domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+                            domClass.remove(self.clearButton, 'jimu-state-disabled');
 
                             downloadData.push(data);
                         }
@@ -1227,7 +1182,7 @@ SimpleLineSymbol) {
           });
 
           // Get the maps to include from the table
-          var userMaps = mapFrame.mapTable.getData();
+          var userMaps = self.mapTable.getData();
           var mapsInclude = [];
           // For each of the maps
           array.forEach(userMaps, function (userMap) {
@@ -1237,7 +1192,7 @@ SimpleLineSymbol) {
                   mapsInclude.push(userMap);
 
                   // For each of the maps from the config
-                  var configMaps = mapFrame.config.maps;
+                  var configMaps = self.config.maps;
                   array.forEach(configMaps, function (configMap) {
                       // If parent map is defined
                       if (configMap.parentMap) {
@@ -1256,7 +1211,7 @@ SimpleLineSymbol) {
           });
 
           // Get the report JSON
-          var configMaps = mapFrame.config.maps;
+          var configMaps = self.config.maps;
           var report = [];
           // For each of the maps from the config
           array.forEach(configMaps, function (configMap) {
@@ -1281,7 +1236,7 @@ SimpleLineSymbol) {
           var reportDataJSON = JSON.stringify(reportData);
 
           // If download data is enabled
-          if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
+          if ((String(self.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(self.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
               // Get the data download JSON
               var downloadDataJSON = JSON.stringify(downloadData);
           }
@@ -1289,12 +1244,12 @@ SimpleLineSymbol) {
               var downloadDataJSON = null;
           }
 
-          mapFrame.loadingInfo.innerHTML = "Creating maps...";
+          self.loadingInfo.innerHTML = "Creating maps...";
           array.forEach(mapsProduce, function (map) {
-              mapFrame.loadingInfo.innerHTML = mapFrame.loadingInfo.innerHTML + "<BR/>" + map;
+              self.loadingInfo.innerHTML = self.loadingInfo.innerHTML + "<BR/>" + map;
           });
           console.log("-----Selected Feature JSON-----");
-          console.log(mapFrame.selectedFeatureJSON);
+          console.log(self.selectedFeatureJSON);
           console.log("-----Webmap JSON-----");
           console.log(webmapJSON);
           console.log("-----Report JSON-----");
@@ -1304,10 +1259,10 @@ SimpleLineSymbol) {
           console.log("-----Download Data JSON-----");
           console.log(downloadDataJSON);
           // Setup the geoprocessing service
-          gpService = new Geoprocessor(mapFrame.config.gpService);
+          gpService = new Geoprocessor(self.config.gpService);
           // Setup parameters for GP service
           var gpParams = {
-              "Selected_Feature_JSON": mapFrame.selectedFeatureJSON,
+              "Selected_Feature_JSON": self.selectedFeatureJSON,
               "Web_Map_as_JSON": webmapJSON,
               "Reports_JSON": reportJSON,
               "Report_Data_JSON": reportDataJSON,
@@ -1322,7 +1277,7 @@ SimpleLineSymbol) {
           gpErrorEvent = gpService.on("error", gpError);
           console.time('Complete Geoprocessing Service');
           // Enable cancel button
-          domClass.remove(mapFrame.cancelButton, 'jimu-state-disabled');
+          domClass.remove(self.cancelButton, 'jimu-state-disabled');
       }
 
       // FUNCTION - Get GP service job status
@@ -1352,9 +1307,9 @@ SimpleLineSymbol) {
               // Get report download link
               reportDownloadLink = outputReport.result.value.url;
               // Enable report download button
-              domClass.remove(mapFrame.reportDownloadButton, 'jimu-state-disabled');
+              domClass.remove(self.reportDownloadButton, 'jimu-state-disabled');
 
-              mapFrame.loadingInfo.innerHTML = "Report generation complete...";
+              self.loadingInfo.innerHTML = "Report generation complete...";
               console.log("Report geoprocessing service job finished...");
               console.log("PDF located here - " + reportDownloadLink + "...");
               // Open the PDF
@@ -1363,13 +1318,13 @@ SimpleLineSymbol) {
               getReportEvent.remove();
 
               // Get the output data if needed
-              if ((String(mapFrame.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(mapFrame.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
+              if ((String(self.config.downloadDataIntersectLayers).toLowerCase() == "true") && (String(self.dataDownloadFormatSelect.value).toLowerCase() != "none")) {
                   gpService.getResultData(result.jobInfo.jobId, "Output_Data");
                   getDataEvent = gpService.on("get-result-data-complete", function (outputData) {
                       // Get data download link
                       dataDownloadLink = outputData.result.value.url;
                       // Enable data download button
-                      domClass.remove(mapFrame.dataDownloadButton, 'jimu-state-disabled');
+                      domClass.remove(self.dataDownloadButton, 'jimu-state-disabled');
 
                       console.log("Data located here - " + dataDownloadLink + "...");
                       // Download the data
@@ -1381,16 +1336,16 @@ SimpleLineSymbol) {
           });
 
           // Enable submit button
-          domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+          domClass.remove(self.submitButton, 'jimu-state-disabled');
           // Enable clear button
-          domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+          domClass.remove(self.clearButton, 'jimu-state-disabled');
           // Disable cancel button
-          domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+          domClass.add(self.cancelButton, 'jimu-state-disabled');
 
           // Hide loading
           reportGenerating = false;
-          html.setStyle(mapFrame.loading, "display", "none");
-          mapFrame.loadingInfo.innerHTML = "Loading...";
+          html.setStyle(self.loading, "display", "none");
+          self.loadingInfo.innerHTML = "Loading...";
       }
 
       // EVENT FUNCTION - Report download button click
@@ -1421,19 +1376,58 @@ SimpleLineSymbol) {
           console.error(error.error);
 
           // Enable submit button
-          domClass.remove(mapFrame.submitButton, 'jimu-state-disabled');
+          domClass.remove(self.submitButton, 'jimu-state-disabled');
           // Enable clear button
-          domClass.remove(mapFrame.clearButton, 'jimu-state-disabled');
+          domClass.remove(self.clearButton, 'jimu-state-disabled');
           // Disable cancel button
-          domClass.add(mapFrame.cancelButton, 'jimu-state-disabled');
+          domClass.add(self.cancelButton, 'jimu-state-disabled');
           // Disable download buttons
-          domClass.add(mapFrame.reportDownloadButton, 'jimu-state-disabled');
-          domClass.add(mapFrame.dataDownloadButton, 'jimu-state-disabled');
+          domClass.add(self.reportDownloadButton, 'jimu-state-disabled');
+          domClass.add(self.dataDownloadButton, 'jimu-state-disabled');
           // Hide loading
           reportGenerating = false;
-          html.setStyle(mapFrame.loading, "display", "none");
-          mapFrame.loadingInfo.innerHTML = "Loading...";
+          html.setStyle(self.loading, "display", "none");
+          self.loadingInfo.innerHTML = "Loading...";
       }
+    },
+
+    // FUNCTION - Map click
+    mapClick: function (mapPoint) {
+        // If a report isn't already generating, draw is not selected and widget is open
+        if ((this.reportGenerating == false) && (dijit.byId('layerSelect').attr('value').toLowerCase() != "draw") && (this.widgetState.toLowerCase() == "open")) {
+            // Get JSON for the current webmap
+            var printTask = new PrintTask();
+            var printParameters = new PrintParameters();
+            var webmap = printTask._getPrintDefinition(this.map, printParameters);
+
+            // Clear graphics if single select
+            var multipleSelection = dijit.byId("multipleSelection").checked;
+            if (multipleSelection == false) {
+                // Clear selection graphics
+                this.clearSelectionGraphics();
+            }
+
+            // Setup a query
+            var selectQuery = new Query();
+            // Get the map point and make a selection
+            selectQuery.geometry = mapPoint;
+            this.selectionFeatureLayer.selectFeatures(selectQuery,
+                      FeatureLayer.SELECTION_NEW);
+            // Show loading
+            html.setStyle(this.loading, "display", "block");
+            this.loadingInfo.innerHTML = "Loading...";
+        }
+    },
+
+    // FUNCTION - Set current scale for the maps
+    setMapsScale: function () {
+        // Get the current scale of the map
+        var scale = scaleUtils.getScale(this.map);
+        // Update the display text for scale
+        if (this.currentScale) {
+            this.currentScale.innerHTML = "1:" + Math.round(scale).toString();
+        }
+
     },
 
     // FUNCTION - Clear all selection graphics 
@@ -1450,12 +1444,12 @@ SimpleLineSymbol) {
 
     // FUNCTION - Remove all analysis feature layers   
     removeAnalysisFeatureLayers: function () {
-        var mapFrame = this;
+        var self = this;
         // Remove feature layers from the map
         if (this.analysisfeatureLayers.length > 0) {
             console.log("Removing all analysis feature layers from the map...");
             array.forEach(this.analysisfeatureLayers, function (analysisfeatureLayer) {
-                mapFrame.map.removeLayer(analysisfeatureLayer);
+                self.map.removeLayer(analysisfeatureLayer);
                 analysisfeatureLayer = null;
             });
             // Reset global array
@@ -1466,13 +1460,13 @@ SimpleLineSymbol) {
     // EVENT FUNCTION - Open widget
     onOpen: function(){
         console.log('Report widget opened...');
-        widgetState = "Open";
+        this.widgetState = "Open";
     },
 
     // EVENT FUNCTION - Close widget
     onClose: function(){
         console.log('Report widget closed...');
-        widgetState = "Closed";
+        this.widgetState = "Closed";
 
         // Clear info window
         this.map.infoWindow.hide();
@@ -1497,13 +1491,13 @@ SimpleLineSymbol) {
     // EVENT FUNCTION - Minimise widget
     onMinimize: function(){
         console.log('Report widget minimised...');
-        widgetState = "Open";
+        this.widgetState = "Open";
     },
 
     // EVENT FUNCTION - Maximised widget
     onMaximize: function(){
         console.log('Report widget maximised...');
-        widgetState = "Open";
+        this.widgetState = "Open";
     }
   });
 });

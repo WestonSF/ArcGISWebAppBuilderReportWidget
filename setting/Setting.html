@@ -22,8 +22,13 @@
         </tbody>
     </table>
 
+
     <p class="separator"><B>${nls.selectLayers}</B></p>
     <div data-dojo-attach-point="layersTable" class="separator"></div>
+    <div class="add-selectLayer" data-dojo-attach-event="onclick: onSelectAddClick">
+        <span class="add-icon"></span>
+        <span class="add-label">${nls.addSelectLayer}</span>
+    </div>
 
     <table cellspacing="10">
         <tbody>
@@ -39,6 +44,10 @@
 
     <p class="separator"><B>${nls.mapsAvailable}</B></p>
     <div data-dojo-attach-point="mapsTable" class="separator"></div>
+    <div class="add-map" data-dojo-attach-event="onclick: onMapAddClick">
+        <span class="add-icon"></span>
+        <span class="add-label">${nls.addMap}</span>
+    </div>
 
     <table cellspacing="10">
         <tbody>

@@ -48,3 +48,29 @@
       padding-top:10px;
   width:650px;
 }
+
+.jimu-widget-report-setting .add-selectLayer, .add-map{
+  margin-bottom: 7px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.jimu-widget-report-setting .add-icon{
+  background-image: url(images/add_icon.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.jimu-widget-report-setting .add-label{
+  font-size: 14px;
+  color: #518dca;
+  margin-left: 10px;
+  /* line-height: 24px; */
+  display: inline-block;
+  height: 100%;
+  text-decoration: underline;
+}
