@@ -1,4 +1,18 @@
 <div>
+    <div data-dojo-type="dijit/Dialog" data-dojo-attach-point="configOpLayers" title="${nls.operationalLayers}" data-dojo-attach-event="onHide:cancelOpLayers">
+        <div class="dijitDialogPaneContent" data-dojo-attach-point="opLayersContainer">
+            <div data-dojo-attach-point="opLayersTable" class="separator"></div>
+            <div class="add-opLayer" data-dojo-attach-event="onclick: onOpAddClick">
+                <span class="add-icon"></span>
+                <span class="add-label">${nls.addOpLayer}</span>
+            </div>
+        </div>
+        <div class="configOpLayersButtons">
+            <div class="jimu-btn" data-dojo-attach-point="okButton" data-dojo-attach-event="click:saveOpLayers">${nls.ok}</div>
+            <div class="jimu-btn" data-dojo-attach-point="cancelButton" data-dojo-attach-event="click:cancelOpLayers">${nls.cancel} </div>
+       </div>
+    </div>
+
     <table class="setting-table input-table" cellspacing="10">
         <tbody>
             <tr>
@@ -21,7 +35,6 @@
             </tr>
         </tbody>
     </table>
-
 
     <p class="separator"><B>${nls.selectLayers}</B></p>
     <div data-dojo-attach-point="layersTable" class="separator"></div>

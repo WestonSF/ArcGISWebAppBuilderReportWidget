@@ -28,6 +28,7 @@ define({
         visibleLayers: "Visible Layers",
         parentMap: "Parent Map",
         addSelectLayer: "Add Selection Layer",
-        addMap: "Add Map"
+        addMap: "Add Map",
+        addOpLayer: "Add Operational Layer"
   })
 });

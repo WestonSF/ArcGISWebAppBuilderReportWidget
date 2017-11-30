@@ -28,6 +28,7 @@
     {
       "type": "Report - Feature",
       "title": "Property Report",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "",
       "bufferDistance": "",
@@ -37,6 +38,7 @@
     {
       "type": "Map",
       "title": "District Plan Zones",
+      "parentMap": "",
       "scale": "5000",
       "intersectLayer": "",
       "bufferDistance": "",
@@ -53,6 +55,7 @@
     {
       "type": "Map",
       "title": "District Plan Features",
+      "parentMap": "",
       "scale": "5000",
       "intersectLayer": "",
       "bufferDistance": "",
@@ -69,6 +72,7 @@
     {
       "type": "Map",
       "title": "District Plan Management Areas",
+      "parentMap": "",
       "scale": "5000",
       "intersectLayer": "",
       "bufferDistance": "",
@@ -85,6 +89,7 @@
     {
       "type": "Map",
       "title": "Water Services",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "",
       "bufferDistance": "",
@@ -113,6 +118,7 @@
     {
       "type": "Map",
       "title": "Water Races",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/WaterRacesInternal/MapServer",
       "bufferDistance": "",
@@ -129,6 +135,7 @@
     {
       "type": "Map",
       "title": "Flood Zones",
+      "parentMap": "",
       "scale": "10000",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
       "bufferDistance": "",
@@ -145,6 +152,7 @@
     {
       "type": "Map",
       "title": "Tsunami Evacuation Zones",
+      "parentMap": "",
       "scale": "10000",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/TsunamiEvacuationZones/MapServer",
       "bufferDistance": "",
@@ -161,6 +169,7 @@
     {
       "type": "Map",
       "title": "Earthquake Hazards",
+      "parentMap": "",
       "scale": "10000",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/EarthquakeHazards/MapServer",
       "bufferDistance": "",
@@ -177,6 +186,7 @@
     {
       "type": "Map",
       "title": "Carterton Imagery - 1943",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1943/MapServer/1",
       "bufferDistance": "",
@@ -194,6 +204,7 @@
     {
       "type": "Map",
       "title": "Carterton Imagery - 1961",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1961/MapServer/1",
       "bufferDistance": "",
@@ -211,6 +222,7 @@
     {
       "type": "Map",
       "title": "Carterton Imagery - 1974",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1974/MapServer/1",
       "bufferDistance": "",
@@ -228,6 +240,7 @@
     {
       "type": "Map",
       "title": "Carterton Imagery - 1981",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1981/MapServer/1",
       "bufferDistance": "",
@@ -245,6 +258,7 @@
     {
       "type": "Map",
       "title": "Masterton Imagery - 2002",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery2002/MapServer/1",
       "bufferDistance": "",
@@ -262,6 +276,7 @@
     {
       "type": "Report - Analysis",
       "title": "Building Consents Report",
+      "parentMap": "",
       "scale": "",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
       "bufferDistance": "",
@@ -279,6 +294,7 @@
     {
       "type": "Report - Analysis",
       "title": "Resource Consents Report",
+      "parentMap": "",
       "scale": "2000",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
       "bufferDistance": "100",
@@ -296,6 +312,7 @@
     {
       "type": "Report - Analysis",
       "title": "Selected Land Use Register Report",
+      "parentMap": "",
       "scale": "2000",
       "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SelectedLandUseRegister/MapServer/0",
       "bufferDistance": "100",

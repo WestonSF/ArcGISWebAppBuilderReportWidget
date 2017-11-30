@@ -1,9 +1,11 @@
 define([
   "dojo/_base/declare",
   "dojo/on",
+  "dojo/query",
   "dojo/_base/lang",
   "dojo/_base/array",
   "dojo/_base/html",
+  "dijit/form/Select",
   "dijit/_WidgetsInTemplateMixin",
   "jimu/BaseWidgetSetting",
   "jimu/dijit/SimpleTable",
@@ -12,9 +14,11 @@ define([
 function (
     declare,
     on,
+    query,
     lang,
     array,
     html,
+    Select,
     _WidgetsInTemplateMixin,
     BaseWidgetSetting,
     Table,
@@ -24,6 +28,18 @@ function (
     return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
     baseClass: 'jimu-widget-report-setting',
     opLayerFields: null,
+    mapSelected: null,
+    // Set the map type options
+    mapTypes: [{
+        value: 'Map',
+        label: 'Map'
+    }, {
+        value: 'Report - Feature',
+        label: 'Report - Feature'
+    }, {
+        value: 'Report - Analysis',
+        label: 'Report - Analysis'
+    }],
 
     // EVENT FUNCTION - Creation of widget
     postCreate: function(){
@@ -104,8 +120,8 @@ function (
         var fields = [{
             name: 'type',
             title: this.nls.type,
-            type: 'text',
-            width: '10%',
+            type: 'empty',
+            width: '20%',
             unique: false,
             editable: true
         }, {
@@ -133,7 +149,7 @@ function (
             name: 'intersectLayer',
             title: this.nls.intersectLayer,
             type: 'text',
-            width: '20%',
+            width: '10%',
             unique: false,
             editable: true
         }, {
@@ -177,10 +193,10 @@ function (
         this.mapTable.startup();
 
         // Load in maps
-        if (this.config.maps.length > 0) {
-            var json = [];
+        if (this.config.maps.length > 0) {       
             var len = this.config.maps.length;
             for (var a = 0; a < len; a++) {
+                var json = [];
                 json.push({
                     type: this.config.maps[a].type,
                     title: this.config.maps[a].title,
@@ -191,10 +207,31 @@ function (
                     reportFields: this.config.maps[a].reportFields,
                     operationalLayers: this.config.maps[a].operationalLayers
                 });
+                // Add a row from the JSON config
+                var result = this.mapTable.addRow(json[0]);
+                // If row has been added
+                if (result.success && result.tr) {
+                    // Add a selection to the first column for map types
+                    var tr = result.tr;
+                    var typeOptions = lang.clone(this.mapTypes);
+                    var td = query('.simple-table-cell', tr)[0];
+                    if (td) {
+                        html.setStyle(td, "verticalAlign", "middle");
+                        var selectTypes = new Select({
+                            style: {
+                                width: "100%"
+                            },
+                            options: typeOptions
+                        });
+                        selectTypes.placeAt(td);
+                        selectTypes.startup();
+                        tr.selectTypes = selectTypes;
+                        selectTypes.set("value", this.config.maps[a].type);
+                    }
+                }
                 // Add operational layers data to array
                 this.opLayerFields[this.config.maps[a].title] = this.config.maps[a].operationalLayers;
             }
-            this.mapTable.addRows(json);
         }
 
         this.own(on(
@@ -259,10 +296,67 @@ function (
         // Add new row to table for editing
         var result = this.mapTable.addRow({});
         if (result.success && result.tr) {
+            // Add a selection to the first column for map types
+            var tr = result.tr;
+            var typeOptions = lang.clone(this.mapTypes);
+            var td = query('.simple-table-cell', tr)[0];
+            if (td) {
+                html.setStyle(td, "verticalAlign", "middle");
+                var selectTypes = new Select({
+                    style: {
+                        width: "100%"
+                    },
+                    options: typeOptions
+                });
+                selectTypes.placeAt(td);
+                selectTypes.startup();
+                tr.selectTypes = selectTypes;
+            }
         }
     },
 
-    // FUNCTION - When edit layers button is clicked
+    // FUNCTION - When add operational layer button is clicked
+    onOpAddClick: function () {
+        console.log("Adding operational layer...")
+        // Add new row to table for editing
+        var result = this.opLayerTable.addRow({});
+        if (result.success && result.tr) {
+        }
+    },
+
+    // FUNCTION - When save is clicked on configure operational layers
+    saveOpLayers: function () {
+        // For each of the maps
+        var layerLen = this.config.maps.length;
+        for (var c = 0; c < layerLen; c++) {
+            // Get the selected map
+            if (this.config.maps[c].title.toLowerCase() == this.mapSelected.toLowerCase()) {
+                var opLayersselectionData = this.opLayerTable.getData();
+                // Update the operational layers for this map
+                this.config.maps[c].operationalLayers = opLayersselectionData;
+
+                // For each operational layer
+                var layerLen = this.config.maps[c].operationalLayers.length;
+                for (var d = 0; d < layerLen; d++) {
+                    var visibleLayers = this.config.maps[c].operationalLayers[d].visibleLayers;
+                    // Convert operational layers to array
+                    this.config.maps[c].operationalLayers[d].visibleLayers = JSON.parse("[" + visibleLayers + "]");
+                }
+            }
+        }
+        // Close dialog
+        this.configOpLayers.hide();
+        html.empty(this.opLayersTable);
+    },
+
+    // FUNCTION - When cancel is clicked on configure operational layers
+    cancelOpLayers: function () {
+        // Close dialog
+        this.configOpLayers.hide();
+        html.empty(this.opLayersTable);
+    },
+
+    // FUNCTION - When edit layers button is clicked on a map
     editLayersClick: function (tr) {
         console.log("Editing operational layers...")
 
@@ -322,21 +416,21 @@ function (
             fields: fields,
             selectable: false
         };
-        var content = html.create("div");
-        var opLayersTable = new Table(args);
-        opLayersTable.autoHeight = true;
-        html.place(opLayersTable.domNode, content);
+
+        this.opLayerTable = new Table(args);
+        this.opLayerTable.autoHeight = true;
+        this.opLayerTable.placeAt(this.opLayersTable);
+        this.opLayerTable.startup();
 
         // If there are maps
         if (this.config.maps.length > 0) {
-
             // For each map
             var json = [];
             var mapLen = this.config.maps.length;
             for (var a = 0; a < mapLen; a++) {
-                var selectionData = this.mapTable.getRowData(tr);
+                this.mapSelected = this.mapTable.getRowData(tr).title;
                 // For the map selected
-                if (selectionData.title == this.config.maps[a].title) {
+                if (this.mapSelected == this.config.maps[a].title) {
                     // For each layer
                     var layerLen = this.config.maps[a].operationalLayers.length;
                     for (var b = 0; b < layerLen; b++) {
@@ -352,51 +446,11 @@ function (
                     }
                 }
             }
-            opLayersTable.addRows(json);
-        }
-        
+            this.opLayerTable.addRows(json);
+        }    
+
         // Show the operational layers popup
-        var layersPopup = new Popup({
-            titleLabel: this.nls.operationalLayers,
-            width: 1000,
-            maxHeight: 700,
-            autoHeight: true,
-            content: content,
-            buttons: [{
-                label: this.nls.ok,
-                onClick: lang.hitch(this, function () {
-                    // For each of the maps
-                    var layerLen = this.config.maps.length;
-                    for (var c = 0; c < layerLen; c++) {
-                        // Get the selected map
-                        if (this.config.maps[c].title.toLowerCase() == selectionData.title.toLowerCase()) {
-                            var opLayersselectionData = opLayersTable.getData();
-                            // Update the operational layers for this map
-                            this.config.maps[c].operationalLayers = opLayersselectionData;
-
-                            // For each operational layer
-                            var layerLen = this.config.maps[c].operationalLayers.length;
-                            for (var d = 0; d < layerLen; d++) {
-                                var visibleLayers = this.config.maps[c].operationalLayers[d].visibleLayers;
-                                // Convert operational layers to array
-                                this.config.maps[c].operationalLayers[d].visibleLayers = JSON.parse("[" + visibleLayers + "]");
-                            }
-                        }
-                    }
-                    layersPopup.close();
-                })
-            }, {
-                label: this.nls.cancel,
-                classNames: ['jimu-btn-vacation'],
-                onClick: lang.hitch(this, function () {
-                    layersPopup.close();
-                })
-            }],
-            onClose: function () {
-
-            }
-        });
-        opLayersTable.startup();
+        this.configOpLayers.show();
     },
 
     // FUNCTION - Get the configuration parameters from the configure widget and load into configuration file
@@ -421,14 +475,25 @@ function (
         this.config.enableDraw = this.enableDrawTools.checked;
 
         // Get the maps
-        var data = this.mapTable.getData();
         var json = [];
-        var len = data.length;
-        for (var i = 0; i < len; i++) {
-            // Add in the operational layers
-            data[i].operationalLayers = this.config.maps[i].operationalLayers;
-            json.push(data[i]);
-        }
+        var trs = this.mapTable.getRows();
+        var count = 0;
+        array.forEach(trs, lang.hitch(this, function (tr) {
+            // Get the row data and push into array
+            var row = this.mapTable.getRowData(tr);
+            row.type = tr.selectTypes.value;
+            // If the map has already been setup
+            if (this.config.maps[count]) {
+                row.operationalLayers = this.config.maps[count].operationalLayers;
+            }
+            // Else a newly added map
+            else {
+                row.operationalLayers = [];
+            }
+
+            json.push(row);
+            count++;
+        }));
         this.config.maps = json;
 
         // Get the intersect layers option

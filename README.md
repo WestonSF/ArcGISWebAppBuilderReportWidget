@@ -1,4 +1,4 @@
-# WebMap Switcher Widget for ArcGIS Web AppBuilder
+# Report Widget for ArcGIS Web AppBuilder
 
 Report widget.
 
