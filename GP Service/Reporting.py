@@ -391,7 +391,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                             json.dump(data, jsonFile)
 
                         # Get title
-                        title = str(data['title']).replace(" ","_").replace("-","_").replace(".","_").replace("&","_").replace(":","_")
+                        title = str(data['title']).replace(" ","_").replace("-","_").replace(".","_").replace("&","_").replace(":","_").replace("%","_")
                         if (downloadFormat.lower() == "file geodatabase"):
                             # Convert json file to features - File goedatabase
                             outputDataset = os.path.join(outputGeodatabase, title)
