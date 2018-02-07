@@ -34,6 +34,9 @@ function (
         value: 'Map',
         label: 'Map'
     }, {
+        value: 'Report',
+        label: 'Report'
+    }, {
         value: 'Report - Feature',
         label: 'Report - Feature'
     }, {
@@ -62,6 +65,9 @@ function (
         // Set the GP service
         this.gpService.set('value', this.config.gpService);
 
+        // Set the search integration option
+        this.enableSearchIntegration.set('checked', config.enableSearchIntegration);
+
         // Setup the layers table
         var fields = [{
             name: 'layerName',
@@ -72,6 +78,12 @@ function (
         }, {
             name: 'serviceURL',
             title: this.nls.serviceURL,
+            type: 'text',
+            unique: false,
+            editable: true
+        }, {
+            name: 'displayLabel',
+            title: this.nls.displayLabel,
             type: 'text',
             unique: false,
             editable: true
@@ -107,6 +119,7 @@ function (
                 json.push({
                     layerName: this.config.layers[a].layerName,
                     serviceURL: this.config.layers[a].serviceURL,
+                    displayLabel: this.config.layers[a].displayLabel,
                     displayField: this.config.layers[a].displayField
                 });
             }
@@ -148,6 +161,13 @@ function (
         }, {
             name: 'intersectLayer',
             title: this.nls.intersectLayer,
+            type: 'text',
+            width: '10%',
+            unique: false,
+            editable: true
+        }, {
+            name: 'showIntersectLayer',
+            title: this.nls.showIntersectLayer,
             type: 'text',
             width: '10%',
             unique: false,
@@ -203,6 +223,7 @@ function (
                     parentMap: this.config.maps[a].parentMap,
                     scale: this.config.maps[a].scale,
                     intersectLayer: this.config.maps[a].intersectLayer,
+                    showIntersectLayer: this.config.maps[a].showIntersectLayer,
                     bufferDistance: this.config.maps[a].bufferDistance,
                     reportFields: this.config.maps[a].reportFields,
                     operationalLayers: this.config.maps[a].operationalLayers
@@ -239,6 +260,9 @@ function (
           'actions-edit',
           lang.hitch(this, this.editLayersClick)
         ));
+
+        // Set the subtitle option
+        this.enableSubtitle.set('checked', config.showSubtitle);
 
         // Set the intersect layers option
         this.enableIntersectLayers.set('checked', config.showIntersectLayers);
@@ -462,6 +486,9 @@ function (
         // Get the GP service
         this.config.gpService = this.gpService.get('value');
 
+        // Get the search integration option
+        this.config.enableSearchIntegration = this.enableSearchIntegration.checked;
+
         // Get the layers
         var data = this.layerTable.getData();
         var json = [];
@@ -495,6 +522,9 @@ function (
             count++;
         }));
         this.config.maps = json;
+
+        // Get the subtitle option
+        this.config.showSubtitle = this.enableSubtitle.checked;
 
         // Get the intersect layers option
         this.config.showIntersectLayers = this.enableIntersectLayers.checked;

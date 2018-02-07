@@ -20,7 +20,7 @@
     </table>
 
     <div data-dojo-attach-point="drawTools" style="display:none;">
-        <div data-dojo-attach-point="drawBox" data-dojo-type="jimu/dijit/DrawBox" data-dojo-props='geoTypes:["POINT","POLYLINE","POLYGON"],showClear:true,keepOneGraphic:true,deactivateAfterDrawing:true'></div>
+        <div data-dojo-attach-point="drawBox" data-dojo-type="jimu/dijit/DrawBox" data-dojo-props='geoTypes:["POLYGON","FREEHAND_POLYGON","EXTENT"],showClear:false,keepOneGraphic:false,deactivateAfterDrawing:true'></div>
     </div>
     <br />
 
@@ -57,6 +57,18 @@
 
     <div data-dojo-attach-point="mapsTable"></div>
 
+    <table class="subtitle-table" data-dojo-attach-point="subtitleTable" cellspacing="0" style="display:none;">
+        <tbody>
+            <tr>
+                <td class="first"><label data-dojo-attach-point="subtitleLabel">${nls.subtitle}:</label></td>
+                <td class="second"><input type="text" data-dojo-type="dijit/form/ValidationTextBox"
+                    data-dojo-attach-point="subtitleText"
+                    data-dojo-props="style:{width:'100%'}"
+                    required="false" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
     <table class="reportquality-table" data-dojo-attach-point="reportQualityTable" cellspacing="0" style="display:none;">
         <tbody>
             <tr>

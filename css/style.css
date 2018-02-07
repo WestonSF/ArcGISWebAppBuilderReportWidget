@@ -71,6 +71,16 @@
   min-width: 50px;
 }
 
+.jimu-widget-report .subtitle-table {
+  margin-top: 10px;
+}
+
+.jimu-widget-report .subtitle-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
 .jimu-widget-report .reportquality-table {
   margin-top: 10px;
 }

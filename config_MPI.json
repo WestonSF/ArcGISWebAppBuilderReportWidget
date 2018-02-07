@@ -1,57 +1,60 @@
 {
-  "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
-  "gpService": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "description": "Search for land (by address, legal description, title or parcel ID) using the search tool above and click submit to create a report for the selection. Click the map to change the selection or use the drawing tool by changing the selection option below.",
+  "gpService": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/Reporting/GPServer/Reporting",
+  "enableSearchIntegration": "true",
   "layers": [
     {
       "layerName": "Land Parcel",
-      "serviceURL": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/LINZ/Parcels/MapServer/0",
-      "displayField": "appellation"
+      "serviceURL": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/Parcels/MapServer/0",
+      "displayLabel": "Parcel ID Selected: ",
+      "displayField": "id"
     }
   ],
-  "enableDraw": true,
+  "enableDraw": "true",
   "maps": [
     {
       "type": "Map",
       "title": "NES-PF Fish Spawning Habitats Report",
+      "parentMap": "",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer",
-      "showIntersectLayer": false,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer",
+      "showIntersectLayer": "false",
       "bufferDistance": "",
       "reportFields": "",
       "operationalLayers": [
         {
           "title": "Modelled Probability of over 50% - Group A",
           "opacity": "0.9",
-          "url": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/2",
-          "visibleLayers": [],
+          "url": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/2",
+          "visibleLayers": [ ],
           "secure": "false"
         },
         {
           "title": "Modelled Probability of over 50% - Group B",
           "opacity": "0.9",
-          "url": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/3",
-          "visibleLayers": [],
+          "url": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/3",
+          "visibleLayers": [ ],
           "secure": "false"
         },
         {
           "title": "Modelled Probability of over 50% - Group A & Group B",
           "opacity": "0.9",
-          "url": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/4",
-          "visibleLayers": [],
+          "url": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/4",
+          "visibleLayers": [ ],
           "secure": "false"
         },
         {
           "title": "NZFFD Fish Spawning Habitats",
           "opacity": "0.9",
-          "url": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/0",
-          "visibleLayers": [],
+          "url": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/0",
+          "visibleLayers": [ ],
           "secure": "false"
         },
         {
           "title": "Non-Migratory Fish Spawning Habitats",
           "opacity": "0.9",
-          "url": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/1",
-          "visibleLayers": [],
+          "url": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/1",
+          "visibleLayers": [ ],
           "secure": "false"
         }
       ]
@@ -62,11 +65,11 @@
       "parentMap": "NES-PF Fish Spawning Habitats Report",
       "mergeTable": "true",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/0",
-      "showIntersectLayer": true,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/0",
+      "showIntersectLayer": "true",
       "bufferDistance": "",
       "reportFields": "CommonName>Common Name,Species>Species Name,Sensitivity>Sensitivity,Database Source=NZFFD fish habitats,nzreach>NZREACH,SpawnFdate>Spawn From Date,SpawnTdate>Spawn To Date,Comments>Notes",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Report",
@@ -74,11 +77,11 @@
       "parentMap": "NES-PF Fish Spawning Habitats Report",
       "mergeTable": "true",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/2",
-      "showIntersectLayer": true,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/2",
+      "showIntersectLayer": "true",
       "bufferDistance": "",
       "reportFields": "CommonName>Common Name,Species>Species Name,Sensitivity>Sensitivity,Database Source=Modelled,NZREACH>NZREACH,SpawnFdate>Spawn From Date,SpawnTdate>Spawn To Date,Comments>Notes",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Report",
@@ -86,11 +89,11 @@
       "parentMap": "NES-PF Fish Spawning Habitats Report",
       "mergeTable": "true",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/3",
-      "showIntersectLayer": true,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/3",
+      "showIntersectLayer": "true",
       "bufferDistance": "",
       "reportFields": "CommonName>Common Name,Species>Species Name,Sensitivity>Sensitivity,Database Source=Modelled,NZREACH>NZREACH,SpawnFdate>Spawn From Date,SpawnTdate>Spawn To Date,Comments>Notes",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Report",
@@ -98,11 +101,11 @@
       "parentMap": "NES-PF Fish Spawning Habitats Report",
       "mergeTable": "true",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/4",
-      "showIntersectLayer": true,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/4",
+      "showIntersectLayer": "true",
       "bufferDistance": "",
       "reportFields": "CommonName>Common Name,Species>Species Name,Sensitivity>Sensitivity,Database Source=Modelled,NZREACH>NZREACH,SpawnFdate>Spawn From Date,SpawnTdate>Spawn To Date,Comments>Notes",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Report",
@@ -110,33 +113,35 @@
       "parentMap": "NES-PF Fish Spawning Habitats Report",
       "mergeTable": "true",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_FishSpawning/MapServer/1",
-      "showIntersectLayer": true,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/1",
+      "showIntersectLayer": "true",
       "bufferDistance": "",
       "reportFields": "CommonName>Common Name,Species>Species Name,Sensitivity>Sensitivity,Database Source=Non-migratory fish habitats,NZReach>NZREACH,SpawnFdate>Spawn From Date,SpawnTdate>Spawn To Date,Comments>Notes",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Report - Analysis",
       "title": "NES-PF Erosion Susceptibility Classification Report",
+      "parentMap": "",
       "scale": "",
-      "intersectLayer": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_ErosionSusceptibility/MapServer/0",
-      "showIntersectLayer": true,
+      "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/ErosionSusceptibility/MapServer/0",
+      "showIntersectLayer": "true",
       "bufferDistance": "",
-      "reportFields": "ETCode>Erosion Terrain Code,ETDesc>Erosion Terrain Description,ESC 2017 Class,Hectares",
+      "reportFields": "ESC2017,LUC,Legend,Class8e,Hectares",
       "operationalLayers": [
         {
           "title": "Erosion Susceptibility",
           "opacity": "0.5",
-          "url": "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/MPI/NESPF_ErosionSusceptibility/MapServer/0",
-          "visibleLayers": [],
+          "url": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/ErosionSusceptibility/MapServer/0",
+          "visibleLayers": [ ],
           "secure": "false"
         }
       ]
     }
   ],
-  "showIntersectLayers": true,
-  "downloadDataIntersectLayers": true,
-  "showReportQuality": false,
+  "showIntersectLayers": "true",
+  "showSubtitle": "true",
+  "downloadDataIntersectLayers": "true",
+  "showReportQuality": "false",
   "defaultReportQuality": "medium"
 }

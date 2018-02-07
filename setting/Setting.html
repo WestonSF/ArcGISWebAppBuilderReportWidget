@@ -36,6 +36,18 @@
         </tbody>
     </table>
 
+    <table cellspacing="10">
+        <tbody>
+            <tr>
+                <td class="first">${nls.enableSearchIntegration}</td>
+                <td class="second">
+                    <input data-dojo-attach-point="enableSearchIntegration"
+                           data-dojo-type="dijit/form/CheckBox" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     <p class="separator"><B>${nls.selectLayers}</B></p>
     <div data-dojo-attach-point="layersTable" class="separator"></div>
     <div class="add-selectLayer" data-dojo-attach-event="onclick: onSelectAddClick">
@@ -64,6 +76,13 @@
 
     <table cellspacing="10">
         <tbody>
+            <tr>
+                <td class="first">${nls.showSubtitle}</td>
+                <td class="second">
+                    <input data-dojo-attach-point="enableSubtitle"
+                           data-dojo-type="dijit/form/CheckBox" />
+                </td>
+            </tr>
             <tr>
                 <td class="first">${nls.showIntersectLayers}</td>
                 <td class="second">

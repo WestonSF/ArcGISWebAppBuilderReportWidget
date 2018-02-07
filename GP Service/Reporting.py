@@ -15,7 +15,7 @@
 #             - ReportLab 2.6+
 # Author:     Shaun Weston (shaun_weston@eagle.co.nz)
 # Date Created:    27/04/2017
-# Last Updated:    01/12/2017
+# Last Updated:    07/02/2018
 # Copyright:   (c) Eagle Technology
 # ArcGIS Version:   ArcMap 10.4+
 # Python Version:   2.7
@@ -235,6 +235,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
 
                 # If creating a map
                 if (reportData["type"].lower() != "report"):
+                    # TO DO - Work with ArcGIS Pro
                     # Python version check for ArcGIS Pro
                     #if sys.version_info[0] >= 3:
                         # Python 3.x - ArcGIS Pro - Create report
@@ -255,11 +256,22 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     result = arcpy.mapping.ConvertWebMapToMapDocument(webmapJSON, template)
                     mxd = result.mapDocument
 
-                    # If there is a page number text element
+                    # Update text elements - Subtitle and page number
                     for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
                         if element.text == "[PageNumber]":
                             # Update the page number in the mxd
                             element.text = pdfPages
+                        if element.text == "[Subtitle]":
+                            if "subtitle" in reportData:
+                                if(reportData["subtitle"]):
+                                    # Update the subtitle in the mxd
+                                    element.text = reportData["subtitle"]
+                                else:
+                                    # Update the subtitle in the mxd
+                                    element.text = " "
+                            else:
+                                # Update the subtitle in the mxd
+                                element.text = " "
 
                     # If feature report
                     if (reportData["type"].lower() == "report - feature"):
@@ -566,7 +578,12 @@ def analysisReport(reportTitle,reportsData,reportingData):
 
     # For each of the reports
     reportFields = ""
+    subtitleText = ""
     for repData in reportsData:
+        # If subtitle is to be added
+        if "subtitle" in repData:
+            subtitleText = repData["subtitle"]
+
         # Get the report fields for the current map
         if (repData['title'].lower() == reportTitle.lower()):
             reportFields = repData['reportFields']
@@ -709,11 +726,16 @@ def analysisReport(reportTitle,reportsData,reportingData):
         tableStyle = styles["BodyText"]
         tableStyle.fontSize = 9
         tableStyle.wordWrap = 'CJK'
-        # Header
+        # Title
         styles=getSampleStyleSheet()
         title = styles["Title"]
         title.alignment = TA_CENTER
         title.fontSize = 14
+        # Subtitle
+        styles=getSampleStyleSheet()
+        subtitle = styles["Italic"]
+        subtitle.alignment = TA_LEFT
+        subtitle.fontSize = 8
         # Date
         styles=getSampleStyleSheet()
         date = styles["Normal"]
@@ -727,11 +749,17 @@ def analysisReport(reportTitle,reportsData,reportingData):
 
         # Add a title
         elements.append(Paragraph(reportTitle, title))
-        elements.append(Spacer(1, 12))
+        elements.append(Spacer(1, 2))
+
+        # If subtitle is to be added
+        if subtitleText:
+            # Add a subtitle
+            elements.append(Paragraph(subtitleText, subtitle))
+            elements.append(Spacer(1, 12))
 
         # Add a table
         tableData = [[Paragraph(cell, tableStyle) for cell in row] for row in tableData]
-        table=Table(tableData)
+        table=Table(tableData, repeatRows=1)
         table.setStyle(TableStyle([
                 ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
@@ -790,7 +818,7 @@ def createLegend(mxd):
     # Remove all text elements
     for element in arcpy.mapping.ListLayoutElements(legendMXD, "TEXT_ELEMENT"):
         # If there is a page number text element
-        if element.text == "[PageNumber]":
+        if element.name.lower() == "page number":
             # Update the page number in the mxd
             element.text = pdfPages
         else:

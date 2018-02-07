@@ -1,6 +1,7 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
   "gpService": "https://gis.mstn.govt.nz/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "enableSearchIntegration": "false",
   "layers": [
     {
       "layerName": "Masterton Property",
@@ -328,8 +329,9 @@
       ]
     }
   ],
-  "showIntersectLayers": false,
-  "downloadDataIntersectLayers": false,
+  "showIntersectLayers": "false",
+  "showSubtitle": "false",
+  "downloadDataIntersectLayers": "false",
   "showReportQuality": "true",
   "defaultReportQuality": "medium"
 }

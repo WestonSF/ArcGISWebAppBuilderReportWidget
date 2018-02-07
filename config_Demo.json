@@ -1,10 +1,12 @@
 {
   "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
   "gpService": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+  "enableSearchIntegration": "false",
   "layers": [
     {
       "layerName": "Land Parcel",
       "serviceURL": "https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com/arcgis/rest/services/LINZ/Parcels/MapServer/0",
+      "displayLabel": "Parcel ID Selected: ",
       "displayField": "id"
     }
   ],
@@ -38,8 +40,9 @@
       ]
     }
   ],
-  "showIntersectLayers": true,
-  "downloadDataIntersectLayers": false,
+  "showIntersectLayers": "true",
+  "showSubtitle": "false",
+  "downloadDataIntersectLayers": "false",
   "showReportQuality": "true",
   "defaultReportQuality": "medium"
 }

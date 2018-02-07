@@ -3,6 +3,7 @@ define({
         description: "Description",
 	    layerName: "Layer Name",
 	    serviceURL: "Service URL",
+        displayLabel: "Display Label",
 	    displayField: "Display Field",
         type: "Type",
         title: "Title",
@@ -17,10 +18,12 @@ define({
         selectLayers: "Selection Layers",
         mapsAvailable: "Maps Available",
         gpService: "Reporting Geoprocessing Service",
+        showIntersectLayer: "Show Intersect Service",
         intersectLayer: "Intersect Service",
         bufferDistance: "Buffer Distance",
         reportFields: "Report Fields",
         enableDrawTools: "Enable Drawing Tools",
+        showSubtitle: "Show Subtitle",
         showIntersectLayers: "Show Intersect Layers on Map",
         showReportQuality: "Show Report Quality",
         defaultReportQuality: "Default Report Quality",
@@ -29,6 +32,7 @@ define({
         parentMap: "Parent Map",
         addSelectLayer: "Add Selection Layer",
         addMap: "Add Map",
-        addOpLayer: "Add Operational Layer"
+        addOpLayer: "Add Operational Layer",
+        enableSearchIntegration: "Enable Search to Report Integration"
   })
 });

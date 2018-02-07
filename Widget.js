@@ -197,6 +197,11 @@ SimpleLineSymbol) {
           "quality": 300
       }]
 
+      // Show subtitle if needed
+      if (String(this.config.showSubtitle).toLowerCase() == "true") {
+          html.setStyle(this.subtitleTable, "display", "block");
+      }
+
       // Show report quality table if needed
       if (String(this.config.showReportQuality).toLowerCase() == "true") {
           html.setStyle(this.reportQualityTable, "display", "block");
@@ -270,7 +275,7 @@ SimpleLineSymbol) {
       var gpService = null;
       var reportGenerating = false;
       var gpServiceJobId = null;
-      
+
       // On map table row click
       this.mapTable.on("row-click", function () {
           var allCheckboxes = self.mapTable._getAllEnabledTdCheckBoxes("include");
@@ -344,22 +349,49 @@ SimpleLineSymbol) {
           this.drawBox.on("draw-end", function () {
               // Get JSON for the drawn feature
               var selectedFeature = {};
-              self.selectedGeometry = this.drawLayer.graphics[0].geometry;
-              selectedFeature.geometry = this.drawLayer.graphics[0].geometry;
-              selectedFeature.attributes = this.drawLayer.graphics[0].attributes;
+
+              // For each of the graphics drawn
+              var len = this.drawLayer.graphics.length;
+              for (var a = 0; a < len; a++) {
+                  // If the first graphic
+                  if (a == 0) {
+                      // Set the selected geometry
+                      self.selectedGeometry = this.drawLayer.graphics[a].geometry;
+                  }
+                  // If it's the last graphic
+                  else if (a == (len-1)) {
+                      // If graphic geometry is the same as the first one - If mixed geometry, won't append and will ignore the other geometries
+                      if (self.selectedGeometry.type.toLowerCase() == this.drawLayer.graphics[a].geometry.type.toLowerCase()) {
+                          // If a point
+                          if (self.selectedGeometry.type.toLowerCase() == "point") {
+                              // Update the entire geometry
+                              // TODO - Convert to multi point
+                              self.selectedGeometry = this.drawLayer.graphics[a].geometry;
+                          }
+                          // If a polyline
+                          else if (self.selectedGeometry.type.toLowerCase() == "polyline") {
+                              // Append to existing geometry
+                              self.selectedGeometry.paths.push(this.drawLayer.graphics[a].geometry.paths[0]);
+                          }
+                          // Else polygon
+                          else {
+                              // Append to existing geometry
+                              self.selectedGeometry.rings.push(this.drawLayer.graphics[a].geometry.rings[0]);
+                          }
+                      }
+                  }
+              }
+
+              selectedFeature.geometry = self.selectedGeometry;
+              selectedFeature.attributes = null;
+
+              console.log(selectedFeature);
               self.selectedFeatureJSON = JSON.stringify(selectedFeature);
 
               // Enable submit button
               domClass.remove(self.submitButton, 'jimu-state-disabled');
-          });
-          // On clear graphics handler
-          this.drawBox.on("clear", function () {
-              // Reset selection
-              self.map.infoWindow.hide();
-              domClass.add(self.submitButton, 'jimu-state-disabled');
-              self.featureSelected.innerHTML = "No features currently selected...";
-              self.selectedFeatureJSON = null;
-              self.selectedGeometry = null;
+              // Enable clear button
+              domClass.remove(self.clearButton, 'jimu-state-disabled');
           });
       }
 
@@ -462,6 +494,7 @@ SimpleLineSymbol) {
               // If a polyline
               else if (self.selectedGeometry.type.toLowerCase() == "polyline") {
                   // Centre map on the feature
+                  self.selectedGeometry.clearCache();
                   var extent = self.selectedGeometry.getExtent();
                   // Expand extent out
                   map.setExtent(extent.expand(2));
@@ -469,7 +502,9 @@ SimpleLineSymbol) {
               // Else polygon
               else {
                   // Centre map on the feature
+                  self.selectedGeometry.clearCache();
                   var extent = self.selectedGeometry.getExtent();
+
                   // Get area of polygon
                   var geometryArea = geometryEngine.planarArea(self.selectedGeometry, "square-meters");
                   if (geometryArea < 10000) {
@@ -601,6 +636,7 @@ SimpleLineSymbol) {
               for (var a = 0; a < len; a++) {
                   if (reportLayer.toLowerCase() == self.config.layers[a].serviceURL.toLowerCase()) {
                       var displayField = self.config.layers[a].displayField;
+                      var displayLabel = self.config.layers[a].displayLabel;
                   }
               }
 
@@ -637,7 +673,7 @@ SimpleLineSymbol) {
                           selectedFeature.attributes = selection.attributes;
                           self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                           // Update the display text
-                          self.featureSelected.innerHTML = selectedFeature.attributes[displayField];
+                          self.featureSelected.innerHTML = displayLabel + selectedFeature.attributes[displayField];
                       }
                   });
 
@@ -654,7 +690,7 @@ SimpleLineSymbol) {
                               selectedFeature.attributes = selection.attributes;
                               self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                               // Update the display text
-                              self.featureSelected.innerHTML = selectedFeature.attributes[displayField];
+                              self.featureSelected.innerHTML = displayLabel + selectedFeature.attributes[displayField];
                         }
                       });
                   })
@@ -679,7 +715,7 @@ SimpleLineSymbol) {
                       else {
                           selectedFeature.geometry = graphicLayer.geometry;
                           self.selectedGeometry = graphicLayer.geometry;
-                          self.featureSelected.innerHTML = graphicLayer.attributes[displayField];
+                          self.featureSelected.innerHTML = displayLabel + graphicLayer.attributes[displayField];
                       }
                       selectedFeature.attributes = graphicLayer.attributes;
                       self.selectedFeatureJSON = JSON.stringify(selectedFeature);
@@ -1041,6 +1077,7 @@ SimpleLineSymbol) {
                                 "fields": result.fields,
 
                             };
+
                             // Create a feature layer
                             var infoTemplate = new InfoTemplate();
                             var featureLayer = new FeatureLayer(featureCollection,
@@ -1152,12 +1189,12 @@ SimpleLineSymbol) {
                                 data.downloadFormat = self.dataDownloadFormatSelect.value;
                                 data.title = mapIntersectQueries[count].title;
                             }
-
                             // Add feature layer to the map and global array
                             self.analysisfeatureLayers.push(featureLayer);
                             map.addLayer(featureLayer);
                             // Add features to feature layer
                             featureLayer.applyEdits(featuresToAdd, null, null);
+
                             // Enable clear button
                             domClass.remove(self.clearButton, 'jimu-state-disabled');
 
@@ -1222,6 +1259,18 @@ SimpleLineSymbol) {
                       if (mapsProduce.indexOf(mapInclude.map) != -1) {
                           // Update scale
                           configMap.scale = Number(mapInclude.scale);
+
+                          // Set the subtitle for the maps if needed
+                          if (String(self.config.showSubtitle).toLowerCase() == "true") {
+                              // If subtitle text is blank
+                              if (self.subtitleText.get('value') == "") {
+                                configMap.subtitle = self.featureSelected.innerHTML;
+                              }
+                              // Subtitle text is populated
+                              else {
+                                configMap.subtitle = self.subtitleText.get('value');
+                              }
+                          }
 
                           // Push into array
                           report.push(configMap);
@@ -1391,6 +1440,34 @@ SimpleLineSymbol) {
       }
     },
 
+    // FUNCTION - When data is received from another widget
+    onReceiveData: function (name, widgetId, data, historyData) {
+        // If search integration functionality is enabled
+        if (String(this.config.enableSearchIntegration).toLowerCase() == "true") {
+            // If it is the search widget
+            if (name.toLowerCase() == "search") {
+                // If search result has been selected
+                if (data.selectResult) {
+                    // If a point
+                    if (data.selectResult.result.feature.geometry.type.toLowerCase() == "point") {
+                        // Send the returned point to the map click function
+                        this.mapClick(data.selectResult.result.feature.geometry);
+                    }
+                        // If a polyline
+                    else if (data.selectResult.result.feature.geometry.type.toLowerCase() == "polyline") {
+                        // Send the returned polyline to the map click function
+                        this.mapClick(data.selectResult.result.feature.geometry);
+                    }
+                        // Else polygon
+                    else {
+                        // Send the returned polygon centre point to the map click function
+                        this.mapClick(data.selectResult.result.feature.geometry.getCentroid());
+                    }
+                }
+            }
+        }
+    },
+
     // FUNCTION - Map click
     mapClick: function (mapPoint) {
         // If a report isn't already generating, draw is not selected and widget is open
@@ -1440,6 +1517,9 @@ SimpleLineSymbol) {
             // Reset global array for layers
             this.graphicLayers = [];
         }
+
+        // Clear drawings
+        this.drawBox.clear();
     },
 
     // FUNCTION - Remove all analysis feature layers   

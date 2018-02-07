@@ -8,7 +8,11 @@ Report widget.
 ## Features
 
 * Produce a report on a feature.
-
+* The map type can be one of the folloeing:
+	* Map - Just a map for the selected feature.
+	* Report - Just a report for the selected feature.
+	* Report - Feature - A map and report for the selected feature using an MXD template.
+	* Report - Analysis - A map and a report for the selected feature.
 
 ## Requirements
 
