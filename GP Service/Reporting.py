@@ -15,7 +15,7 @@
 #             - ReportLab 2.6+
 # Author:     Shaun Weston (shaun_weston@eagle.co.nz)
 # Date Created:    27/04/2017
-# Last Updated:    07/02/2018
+# Last Updated:    14/02/2018
 # Copyright:   (c) Eagle Technology
 # ArcGIS Version:   ArcMap 10.4+
 # Python Version:   2.7
@@ -79,7 +79,7 @@ tablesToMerge = []
 tablesMergedCount = 0
 mergedTableData = []
 # Layers in the web map to not show in the reports
-webmaplayersNotShow = []
+webmaplayersNotShow = ["NES-PF Fish Spawning Indicators","NES-PF Erosion Susceptibility Classification"]
 # Layer names to not show in legend
 noLegendLayers = []
 
@@ -174,14 +174,23 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                         webmapData["mapOptions"]["scale"] = reportData["scale"]
                     else:
                         webmapData["mapOptions"]["scale"] = webmapScale
+                    # If the map is to be created over multiple pages
+                    if "multiplePageMap" in reportData:
+                        if(reportData["multiplePageMap"].lower() == "true"):
+                            # Set the scale to 0, so the extent will not be fixed in the MXD and can be changed for each each index
+                            webmapData["mapOptions"]["scale"] = 0
 
                 # Add the basemap to operational layers if necessary
                 if (basemap):
+                    # Update the max scale for basemap to show when zoomed in close
+                    if "maxScale" in basemap:
+                        basemap['maxScale'] = 0
                     webmapData["operationalLayers"].append(basemap)
 
                 # Add the operational layers from the webmap
                 for webmapOperationalLayer in webmapOperationalLayers:
                     addLayer = True
+
                     if "title" in webmapOperationalLayer:
                         # If layer in not show array, don't add
                         if webmapOperationalLayer['title'] in webmaplayersNotShow:
@@ -255,6 +264,22 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     pdfPages = pdfPages + 1
                     result = arcpy.mapping.ConvertWebMapToMapDocument(webmapJSON, template)
                     mxd = result.mapDocument
+
+                    # If the map is to be created over multiple pages
+                    multiplePageMap = False
+                    if "multiplePageMap" in reportData:
+                        if(reportData["multiplePageMap"].lower() == "true"):
+                            # Create the multi page index
+                            mxd = multiPageIndex(mxd,selectedFeatureData)
+                            multiplePageMap = True
+
+                    # If single page map
+                    if (multiplePageMap == False):
+                        # Remove the overview data frame if it exists
+                        for df in arcpy.mapping.ListDataFrames(mxd, "*"):
+                            if (df.name.lower() == "overview"):
+                                df.elementHeight = 0
+                                df.elementWidth = 0
 
                     # Update text elements - Subtitle and page number
                     for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
@@ -331,37 +356,92 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                             dataFrameElement = arcpy.mapping.ListLayoutElements(mxd, "DATAFRAME_ELEMENT")[0]
                             reSizeElement(mxd,"DATAFRAME_ELEMENT",dataFrameElement.elementHeight,mxd.pageSize.width-2,dataFrameElement.elementPositionX,dataFrameElement.elementPositionY)
 
-                    # Use the uuid module to generate a GUID as part of the output name
-                    # This will ensure a unique output name
-                    outputFileName = 'Map_{}.{}'.format(str(uuid.uuid1()), ".pdf")
-                    outputPath = os.path.join(arcpy.env.scratchFolder, outputFileName)
-                    # Export the map to PDF
-                    printMessage("Exporting " + reportData["title"] + " map to PDF...","info")
-                    arcpy.mapping.ExportToPDF(mxd, outputPath, resolution=DPI)
-                    pdf = arcpy.mapping.PDFDocumentOpen(outputPath)
+                    # Order for PDFs - Map/feature report, legend, report
+                    # If single page map
+                    if (multiplePageMap == False):
+                        # Use the uuid module to generate a GUID as part of the output name, this will ensure a unique output name
+                        outputFileName = 'Map_{}.{}'.format(str(uuid.uuid1()), ".pdf")
+                        outputPath = os.path.join(arcpy.env.scratchFolder, outputFileName)
+                        # Export the map to PDF
+                        printMessage("Exporting " + reportData["title"] + " map to PDF...","info")
+                        arcpy.mapping.ExportToPDF(mxd, outputPath, resolution=DPI)
+                        PDFs.append(outputPath)
+                    # Multi map page
+                    else:
+                        # Set the data frames
+                        webmapFrame = arcpy.mapping.ListDataFrames(mxd, "Webmap")[0]
+                        # Check if overview data frame exists
+                        overviewFrameExists = False
+                        for df in arcpy.mapping.ListDataFrames(mxd, "*"):
+                            if df.name.lower() == "overview":
+                                overviewFrameExists = True
+                                overviewFrame = arcpy.mapping.ListDataFrames(mxd, "Overview")[0]
+
+                        if (overviewFrameExists == False):
+                            printMessage("No overview map frame exists in template...","warning")
+
+                        # Check if index layer exists
+                        indexLayerExists = False
+                        for layer in arcpy.mapping.ListLayers(mxd, "*", webmapFrame):
+                            if layer.name.lower() == "index":
+                                indexLayerExists = True
+                                 # Get the index layer
+                                indexLayer = arcpy.mapping.ListLayers(mxd, "Index", webmapFrame)[0]
+                                # Get the number of pages from the index
+                                result = arcpy.GetCount_management(indexLayer)
+                                pageCount = int(result.getOutput(0))
+
+                                # For each page
+                                currentPage = 0
+                                while (currentPage < pageCount):
+                                    currentPage = currentPage + 1
+                                    # Select the index for the page and zoom to it
+                                    arcpy.SelectLayerByAttribute_management(indexLayer, "NEW_SELECTION", '"PageNumber" = ' + str(currentPage))
+                                    webmapFrame.extent = indexLayer.getSelectedExtent()
+                                    # Clear the selection
+                                    arcpy.SelectLayerByAttribute_management(indexLayer, "CLEAR_SELECTION")
+
+                                    # Check if overview data frame exists
+                                    for df in arcpy.mapping.ListDataFrames(mxd, "*"):
+                                        if df.name.lower() == "overview":
+                                            # Get the pages layer
+                                            pagesLayer = arcpy.mapping.ListLayers(mxd, "Pages", overviewFrame)[0]
+                                            # Select the index for the page
+                                            arcpy.SelectLayerByAttribute_management(pagesLayer, "NEW_SELECTION", '"PageNumber" = ' + str(currentPage))
+
+                                    # Use the uuid module to generate a GUID as part of the output name, this will ensure a unique output name
+                                    outputFileName = 'Map_{}.{}'.format(str(uuid.uuid1()), ".pdf")
+                                    outputPath = os.path.join(arcpy.env.scratchFolder, outputFileName)
+                                    # Export the map to PDF
+                                    printMessage("Exporting " + reportData["title"] + " maps to PDF - " + str(currentPage) + " of " + str(pageCount) + "...","info")
+                                    arcpy.mapping.ExportToPDF(mxd, outputPath, resolution=DPI)
+                                    PDFs.append(outputPath)
+                        if (indexLayerExists == False):
+                            printMessage("No index layer exists in template...","warning")
+
                     # If legend page
                     if (legendPDF):
                         # Append the legend PDF
-                        pdf.appendPages(legendPDF)
+                        PDFs.append(legendPDF)
 
                     # If analysis report
                     if (reportData["type"].lower() == "report - analysis"):
+                        # Create the report
                         reportPDF = analysisReport(reportData["title"],reportsData,reportingData)
                         # Append the report PDF
-                        pdf.appendPages(reportPDF)
+                        PDFs.append(reportPDF)
 
                     # Clean up - delete the map document reference
                     filePath = mxd.filePath
                     del mxd, result
                     os.remove(filePath)
-                    # Add output path to array
-                    PDFs.append(outputPath)
                 # Produce just the report
                 else:
+                    # Create the report
                     reportPDF = analysisReport(reportData["title"],reportsData,reportingData)
                     # Append the report PDF
                     if (reportPDF):
-                        pdf.appendPages(reportPDF)
+                        PDFs.append(reportPDF)
 
             # Join all the PDFs together into one document
             printMessage("Building PDF Report...","info")
@@ -523,7 +603,8 @@ def featureReport(mxd,selectedFeatureData):
     printMessage("Creating feature report...","info")
     # For each of the text element in the map document
     for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
-        if element.text == "[PageNumber]":
+        # If there is a page number text element
+        if element.name.lower() == "page number":
             # Update the page number in the mxd
             element.text = pdfPages
 
@@ -857,6 +938,48 @@ def createLegend(mxd):
     arcpy.mapping.ExportToPDF(legendMXD, outputPath)
     return outputPath
 # End of create legend function
+
+
+# Start of create multi page index function
+def multiPageIndex(mxd,selectedFeatureData):
+    printMessage("Creating the map over multiple pages...","info")
+
+    # Convert selected feature to a feature class
+    selectedGeometry = arcpy.AsShape(selectedFeatureData["geometry"], True)
+
+    # Create temporary feature class to get shape type
+    arcpy.CopyFeatures_management(selectedGeometry, os.path.join(arcpy.env.scratchGDB, "SelectedFeature"))
+
+    # Create data driven page index features based on the size of the extent of the polygon
+    heightNumber = 2
+    widthNumber = 2
+    featureDetails = arcpy.Describe(os.path.join(arcpy.env.scratchGDB, "SelectedFeature"))
+    featureExtent = featureDetails.extent
+    arcpy.GridIndexFeatures_cartography(os.path.join(arcpy.env.scratchGDB, "SelectedFeatureGrid"), os.path.join(arcpy.env.scratchGDB, "SelectedFeature"), "INTERSECTFEATURE", "NO_USEPAGEUNIT", "", str(featureExtent.width/widthNumber) + " Meters", str(featureExtent.height/heightNumber) + " Meters", "0 0", heightNumber, widthNumber, "1", "NO_LABELFROMORIGIN")
+
+    # Add data priven page indexes to map for the main data frame
+    df = arcpy.mapping.ListDataFrames(mxd, 'Webmap')[0]
+    for lyr in arcpy.mapping.ListLayers(mxd, "*", df):
+        if (lyr.name.lower() == "index"):
+            lyr.replaceDataSource(arcpy.env.scratchGDB, "FILEGDB_WORKSPACE", "SelectedFeatureGrid")
+
+    # If overview data frame exists
+    for df in arcpy.mapping.ListDataFrames(mxd, "*"):
+        if (df.name.lower() == "overview"):
+            # Add data priven page indexes to map for the overview frame
+            df = arcpy.mapping.ListDataFrames(mxd, 'Overview')[0]
+            for lyr in arcpy.mapping.ListLayers(mxd, "*", df):
+                if (lyr.name.lower() == "selection"):
+                    lyr.replaceDataSource(arcpy.env.scratchGDB, "FILEGDB_WORKSPACE", "SelectedFeature")
+                if (lyr.name.lower() == "index"):
+                    lyr.replaceDataSource(arcpy.env.scratchGDB, "FILEGDB_WORKSPACE", "SelectedFeatureGrid")
+                    # Zoom to the grid in the map
+                    ext = lyr.getExtent()
+                    df.extent = ext
+                    df.scale = df.scale * 1.5
+
+    return mxd
+# End of create multi page index function
 
 
 # Start of get token function
