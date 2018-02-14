@@ -16,6 +16,7 @@ define({
      downloadReport: "Download Report",
      downloadData: "Download Data",
      currentScale: "Current Scale",
-     subtitle: "Subtitle"
+     subtitle: "Subtitle",
+     multiplePageMap: "Produce Map over Multiple Pages"
   })
 });

@@ -1,12 +1,12 @@
 {
   "description": "Search for land (by address, legal description, title or parcel ID) using the search tool above and click submit to create a report for the selection. Click the map to change the selection or use the drawing tool by changing the selection option below.",
-  "gpService": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/Reporting/GPServer/Reporting",
+  "gpService": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
   "enableSearchIntegration": "true",
   "layers": [
     {
       "layerName": "Land Parcel",
       "serviceURL": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/Parcels/MapServer/0",
-      "displayLabel": "Parcel ID Selected: ",
+      "displayLabel": "Parcel ID Selected:",
       "displayField": "id"
     }
   ],
@@ -63,7 +63,6 @@
       "type": "Report",
       "title": "NES-PF Fish Spawning Habitats Report: NZFFD Fish Spawning Habitats",
       "parentMap": "NES-PF Fish Spawning Habitats Report",
-      "mergeTable": "true",
       "scale": "",
       "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/0",
       "showIntersectLayer": "true",
@@ -75,7 +74,6 @@
       "type": "Report",
       "title": "NES-PF Fish Spawning Habitats Report: Modelled Probability of over 50% - Group A",
       "parentMap": "NES-PF Fish Spawning Habitats Report",
-      "mergeTable": "true",
       "scale": "",
       "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/2",
       "showIntersectLayer": "true",
@@ -87,7 +85,6 @@
       "type": "Report",
       "title": "NES-PF Fish Spawning Habitats Report: Modelled Probability of over 50% - Group B",
       "parentMap": "NES-PF Fish Spawning Habitats Report",
-      "mergeTable": "true",
       "scale": "",
       "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/3",
       "showIntersectLayer": "true",
@@ -99,7 +96,6 @@
       "type": "Report",
       "title": "NES-PF Fish Spawning Habitats Report: Modelled Probability of over 50% - Group A & Group B",
       "parentMap": "NES-PF Fish Spawning Habitats Report",
-      "mergeTable": "true",
       "scale": "",
       "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/4",
       "showIntersectLayer": "true",
@@ -111,7 +107,6 @@
       "type": "Report",
       "title": "NES-PF Fish Spawning Habitats Report: Non-Migratory Fish Habitats",
       "parentMap": "NES-PF Fish Spawning Habitats Report",
-      "mergeTable": "true",
       "scale": "",
       "intersectLayer": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/FishSpawning/MapServer/1",
       "showIntersectLayer": "true",
@@ -139,9 +134,10 @@
       ]
     }
   ],
+  "showMultiplePageMap": true,
   "showIntersectLayers": "true",
   "showSubtitle": "true",
   "downloadDataIntersectLayers": "true",
-  "showReportQuality": "false",
+  "showReportQuality": false,
   "defaultReportQuality": "medium"
 }

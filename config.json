@@ -20,7 +20,7 @@
       "intersectLayer": "",
       "bufferDistance": "",
       "reportFields": "",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Map",
@@ -40,6 +40,7 @@
       ]
     }
   ],
+  "showMultiplePageMap": "false",
   "showIntersectLayers": "true",
   "showSubtitle": "false",
   "downloadDataIntersectLayers": "false",

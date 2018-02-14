@@ -39,6 +39,12 @@
   min-width: 50px;
 }
 
+.jimu-widget-report .multiplePageMap-table > tbody > tr > .first{
+  text-align: left;
+  padding-right:15px;
+  min-width: 50px;
+}
+
 .jimu-widget-report .button-table {
   margin-top: 10px;
 }

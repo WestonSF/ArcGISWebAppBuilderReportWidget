@@ -34,7 +34,7 @@
       "intersectLayer": "",
       "bufferDistance": "",
       "reportFields": "",
-      "operationalLayers": []
+      "operationalLayers": [ ]
     },
     {
       "type": "Map",
@@ -329,6 +329,7 @@
       ]
     }
   ],
+  "showMultiplePageMap": "false",
   "showIntersectLayers": "false",
   "showSubtitle": "false",
   "downloadDataIntersectLayers": "false",

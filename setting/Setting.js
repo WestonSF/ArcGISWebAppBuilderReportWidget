@@ -261,6 +261,9 @@ function (
           lang.hitch(this, this.editLayersClick)
         ));
 
+        // Set the multiple page map option
+        this.enableMultiplePageMap.set('checked', config.showMultiplePageMap);
+
         // Set the subtitle option
         this.enableSubtitle.set('checked', config.showSubtitle);
 
@@ -522,6 +525,9 @@ function (
             count++;
         }));
         this.config.maps = json;
+
+        // Get the multiple page map option
+        this.config.showMultiplePageMap = this.enableMultiplePageMap.checked;
 
         // Get the subtitle option
         this.config.showSubtitle = this.enableSubtitle.checked;

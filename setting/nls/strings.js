@@ -23,6 +23,7 @@ define({
         bufferDistance: "Buffer Distance",
         reportFields: "Report Fields",
         enableDrawTools: "Enable Drawing Tools",
+        showMultiplePageMap: "Show Multiple Page Map Option",
         showSubtitle: "Show Subtitle",
         showIntersectLayers: "Show Intersect Layers on Map",
         showReportQuality: "Show Report Quality",

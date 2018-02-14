@@ -75,7 +75,8 @@ SimpleLineSymbol) {
     analysisfeatureLayers: [], // Analysis feature layers added to the map for querying/identifying
     reportFeatureLayer: null, // The report feature layer added to the map as background layer
     selectionFeatureLayer: null,
-    // Currently selected feature
+      // Currently selected feature
+    selectionState: null,
     selectedFeatureJSON: null,
     selectedGeometry: null,
     // Download URLs
@@ -196,6 +197,11 @@ SimpleLineSymbol) {
           "label": "High",
           "quality": 300
       }]
+
+      // Show multiple page map option if needed
+      if (String(this.config.showMultiplePageMap).toLowerCase() == "true") {
+          html.setStyle(this.multiplePageMapTable, "display", "block");
+      }
 
       // Show subtitle if needed
       if (String(this.config.showSubtitle).toLowerCase() == "true") {
@@ -347,6 +353,8 @@ SimpleLineSymbol) {
       if (String(this.config.enableDraw).toLowerCase() == "true") {
           // On draw end handler
           this.drawBox.on("draw-end", function () {
+              // Set the selection state
+              self.selectionState = "Draw";
               // Get JSON for the drawn feature
               var selectedFeature = {};
 
@@ -630,6 +638,9 @@ SimpleLineSymbol) {
 
           // If features are returned
           if (self.graphicLayers.length > 0) {
+              // Set the selection state
+              self.selectionState = "Selection";
+
               // Get the display field
               reportLayer = self.layerSelect.value;
               var len = self.config.layers.length;
@@ -1260,11 +1271,27 @@ SimpleLineSymbol) {
                           // Update scale
                           configMap.scale = Number(mapInclude.scale);
 
+                          // If multiple page map is enabled
+                          if (String(self.config.showMultiplePageMap).toLowerCase() == "true") {
+                              // Add option to config
+                              configMap.multiplePageMap = "true";
+                          }
+                          else {
+                              // Add option to config
+                              configMap.multiplePageMap = "false";
+                          }
+
                           // Set the subtitle for the maps if needed
                           if (String(self.config.showSubtitle).toLowerCase() == "true") {
                               // If subtitle text is blank
                               if (self.subtitleText.get('value') == "") {
-                                configMap.subtitle = self.featureSelected.innerHTML;
+                                  // If a feature is selected
+                                  if (self.selectionState.toLowerCase() == "selection") {
+                                      configMap.subtitle = self.featureSelected.innerHTML;
+                                  }
+                                  else {
+                                      configMap.subtitle = "";
+                                  }
                               }
                               // Subtitle text is populated
                               else {
@@ -1278,7 +1305,6 @@ SimpleLineSymbol) {
                   }
               });
           });
-
           var reportJSON = JSON.stringify(report);
 
           // Get the report data JSON
