@@ -259,7 +259,18 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     #layout = aprx.listLayouts("Property Report")[0]
                     # ----------------------------------------------------------------
 
-                    # Convert the WebMap to a map document
+                    # Set the active data frame to layers in the template as the ConvertWebMapToMapDocument will use the active data frame, so need to make sure it's set to Layers
+                    mxdTemplate = arcpy.mapping.MapDocument(template)
+                    # If the active data frame is not layers
+                    if (mxdTemplate.activeDataFrame.name.lower() != "layers"):
+                        # Check the layers data frame exists
+                        for df in arcpy.mapping.ListDataFrames(mxdTemplate, "*"):
+                            if df.name.lower() == "layers":
+                                # Set the active data frame to layers
+                                mxdTemplate.activeView = df.name
+                                mxdTemplate.save()
+
+                    # Convert the WebMap to a map document. Note: ConvertWebMapToMapDocument renames the active dataframe in the template_mxd to "Webmap"
                     printMessage("Converting web map to a map document for " + reportData["title"] + "...","info")
                     pdfPages = pdfPages + 1
                     result = arcpy.mapping.ConvertWebMapToMapDocument(webmapJSON, template)
@@ -315,10 +326,6 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     else:
                         DPI = 72
 
-                    # Reference the data frame that contains the webmap
-                    # Note: ConvertWebMapToMapDocument renames the active dataframe in the template_mxd to "Webmap"
-                    df = arcpy.mapping.ListDataFrames(mxd, 'Webmap')[0]
-
                     # If there is a legend element
                     legendPDF = ""
                     if (len(arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")) > 0):
@@ -370,6 +377,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     else:
                         # Set the data frames
                         webmapFrame = arcpy.mapping.ListDataFrames(mxd, "Webmap")[0]
+
                         # Check if overview data frame exists
                         overviewFrameExists = False
                         for df in arcpy.mapping.ListDataFrames(mxd, "*"):
@@ -404,10 +412,17 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                                     # Check if overview data frame exists
                                     for df in arcpy.mapping.ListDataFrames(mxd, "*"):
                                         if df.name.lower() == "overview":
-                                            # Get the pages layer
-                                            pagesLayer = arcpy.mapping.ListLayers(mxd, "Pages", overviewFrame)[0]
-                                            # Select the index for the page
-                                            arcpy.SelectLayerByAttribute_management(pagesLayer, "NEW_SELECTION", '"PageNumber" = ' + str(currentPage))
+                                            # Check if overview index layer exists
+                                            overviewIndexLayerExists = False
+                                            for layer in arcpy.mapping.ListLayers(mxd, "*", overviewFrame):
+                                                if layer.name.lower() == "index":
+                                                    overviewIndexLayerExists = True
+                                                    # Get the index layer
+                                                    overviewIndexLayer = arcpy.mapping.ListLayers(mxd, "Index", overviewFrame)[0]
+                                                    # Select the index for the page
+                                                    arcpy.SelectLayerByAttribute_management(overviewIndexLayer, "NEW_SELECTION", '"PageNumber" = ' + str(currentPage))
+                                            if (overviewIndexLayerExists == False):
+                                                printMessage("No index layer exists in overview template...","warning")
 
                                     # Use the uuid module to generate a GUID as part of the output name, this will ensure a unique output name
                                     outputFileName = 'Map_{}.{}'.format(str(uuid.uuid1()), ".pdf")
