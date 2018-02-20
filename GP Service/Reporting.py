@@ -289,8 +289,9 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                         # Remove the overview data frame if it exists
                         for df in arcpy.mapping.ListDataFrames(mxd, "*"):
                             if (df.name.lower() == "overview"):
-                                df.elementHeight = 0
-                                df.elementWidth = 0
+                                # Remove the data frame by moving it off the page
+                                df.elementPositionX = -5000
+                                df.elementPositionY = -5000
 
                     # Update text elements - Subtitle and page number
                     for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
