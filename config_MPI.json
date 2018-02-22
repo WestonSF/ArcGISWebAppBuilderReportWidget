@@ -1,5 +1,5 @@
 {
-  "description": "Search for land (by address, legal description, title or parcel ID) using the search tool above and click submit to create a report for the selection. Click the map to change the selection or use the drawing tool by changing the selection option below.",
+  "description": "Search for land (by address, legal description, title or parcel ID) using the search tool and click submit to create a report for the selection. Click the map to change the selection or use the drawing tool by changing the selection option below.",
   "gpService": "https://mpi_nes.cloud.eaglegis.co.nz/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
   "enableSearchIntegration": "true",
   "layers": [
