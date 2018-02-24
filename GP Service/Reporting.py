@@ -15,7 +15,7 @@
 #             - ReportLab 2.6+
 # Author:     Shaun Weston (shaun_weston@eagle.co.nz)
 # Date Created:    27/04/2017
-# Last Updated:    14/02/2018
+# Last Updated:    24/02/2018
 # Copyright:   (c) Eagle Technology
 # ArcGIS Version:   ArcMap 10.4+
 # Python Version:   2.7
@@ -272,7 +272,6 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
 
                     # Convert the WebMap to a map document. Note: ConvertWebMapToMapDocument renames the active dataframe in the template_mxd to "Webmap"
                     printMessage("Converting web map to a map document for " + reportData["title"] + "...","info")
-                    pdfPages = pdfPages + 1
                     result = arcpy.mapping.ConvertWebMapToMapDocument(webmapJSON, template)
                     mxd = result.mapDocument
 
@@ -293,11 +292,8 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                                 df.elementPositionX = -5000
                                 df.elementPositionY = -5000
 
-                    # Update text elements - Subtitle and page number
+                    # Update text element - Subtitle
                     for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
-                        if element.text == "[PageNumber]":
-                            # Update the page number in the mxd
-                            element.text = pdfPages
                         if element.text == "[Subtitle]":
                             if "subtitle" in reportData:
                                 if(reportData["subtitle"]):
@@ -367,6 +363,14 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     # Order for PDFs - Map/feature report, legend, report
                     # If single page map
                     if (multiplePageMap == False):
+                        pdfPages = pdfPages + 1
+                        # Update text element - Page number
+                        for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
+                            # If there is a page number text element
+                            if element.name.lower() == "page number":
+                                # Update the page number in the mxd
+                                element.text = pdfPages
+
                         # Use the uuid module to generate a GUID as part of the output name, this will ensure a unique output name
                         outputFileName = 'Map_{}.{}'.format(str(uuid.uuid1()), ".pdf")
                         outputPath = os.path.join(arcpy.env.scratchFolder, outputFileName)
@@ -424,6 +428,14 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                                                     arcpy.SelectLayerByAttribute_management(overviewIndexLayer, "NEW_SELECTION", '"PageNumber" = ' + str(currentPage))
                                             if (overviewIndexLayerExists == False):
                                                 printMessage("No index layer exists in overview template...","warning")
+
+                                    pdfPages = pdfPages + 1
+                                    # Update text element - Page number
+                                    for element in arcpy.mapping.ListLayoutElements(mxd, "TEXT_ELEMENT"):
+                                        # If there is a page number text element
+                                        if element.name.lower() == "page number":
+                                            # Update the page number in the mxd
+                                            element.text = pdfPages
 
                                     # Use the uuid module to generate a GUID as part of the output name, this will ensure a unique output name
                                     outputFileName = 'Map_{}.{}'.format(str(uuid.uuid1()), ".pdf")
@@ -971,7 +983,45 @@ def multiPageIndex(mxd,selectedFeatureData):
     widthNumber = 2
     featureDetails = arcpy.Describe(os.path.join(arcpy.env.scratchGDB, "SelectedFeature"))
     featureExtent = featureDetails.extent
-    arcpy.GridIndexFeatures_cartography(os.path.join(arcpy.env.scratchGDB, "SelectedFeatureGrid"), os.path.join(arcpy.env.scratchGDB, "SelectedFeature"), "INTERSECTFEATURE", "NO_USEPAGEUNIT", "", str(featureExtent.width/widthNumber) + " Meters", str(featureExtent.height/heightNumber) + " Meters", "0 0", heightNumber, widthNumber, "1", "NO_LABELFROMORIGIN")
+
+    # Get the data frame aspect ratio
+    webmapFrame = arcpy.mapping.ListDataFrames(mxd, "Webmap")[0]
+    webmapFrameAspectRatio = webmapFrame.elementWidth/webmapFrame.elementHeight
+    # Get the feature aspect ratio
+    featureAspectRatio = (featureExtent.width/widthNumber)/(featureExtent.height/heightNumber)
+
+    # Update the aspect ratio to be the same as the data frame
+    featureWidth = featureExtent.height*webmapFrameAspectRatio
+    featureHeight = featureExtent.height
+
+    # Get the current total width of the index
+    rowsNumber = heightNumber
+    colsNumber = widthNumber
+    indexWidthTotal = (featureWidth/widthNumber)*colsNumber
+
+    # If the selection width is bigger than the index width
+    if (featureExtent.width > indexWidthTotal):
+        # Keep adding extra columns until selected extent is covered
+        while (featureExtent.width > indexWidthTotal):
+            # Add an extra column
+            colsNumber = colsNumber + 1
+            indexWidthTotal = (featureWidth/widthNumber)*colsNumber
+    # If the selection width is less than the index width
+    else:
+        # Change index width to the same width as the selection width
+        featureWidth = featureExtent.width
+        featureHeight = featureExtent.width/webmapFrameAspectRatio
+        # Get the current total height of the index
+        indexHeightTotal = (featureHeight/heightNumber)*rowsNumber
+
+        # Keep adding extra rows until selected extent is covered
+        while (featureExtent.height > indexHeightTotal):
+            # Add an extra row
+            rowsNumber = rowsNumber + 1
+            indexHeightTotal = (featureHeight/heightNumber)*rowsNumber
+
+    # Create the grid
+    arcpy.GridIndexFeatures_cartography(os.path.join(arcpy.env.scratchGDB, "SelectedFeatureGrid"), os.path.join(arcpy.env.scratchGDB, "SelectedFeature"), "INTERSECTFEATURE", "NO_USEPAGEUNIT", "", str(featureWidth/widthNumber) + " Meters", str(featureHeight/heightNumber) + " Meters", "0 0", rowsNumber, colsNumber, "1", "NO_LABELFROMORIGIN")
 
     # Add data priven page indexes to map for the main data frame
     df = arcpy.mapping.ListDataFrames(mxd, 'Webmap')[0]
