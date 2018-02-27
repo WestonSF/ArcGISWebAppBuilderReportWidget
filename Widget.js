@@ -899,7 +899,16 @@ SimpleLineSymbol) {
                                                 else {
                                                     var geometryLength = 0.00;
                                                 }
+                                                // If rounding causes the value to be zero, show the unrounded value
                                                 feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                                if (feature.attributes.LengthMetres == 0.00) {
+                                                    // Round to the nearest decimal place
+                                                    var number = geometryLength;
+                                                    const decimals = -Math.log10(number);
+                                                    const integerPart = Math.floor(decimals);
+                                                    const fractionalPart = decimals - integerPart;
+                                                    feature.attributes.LengthMetres = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                }
                                             }
                                             break;
                                         case "polygon":
@@ -918,8 +927,25 @@ SimpleLineSymbol) {
                                                     var geometryArea = 0.00;
                                                     var geometryLength = 0.00;
                                                 }
+                                                // If rounding causes the value to be zero, show the unrounded value
                                                 feature.attributes.Hectares = parseFloat(geometryArea).toFixed(2);
+                                                if (feature.attributes.Hectares == 0.00) {
+                                                    // Round to the nearest decimal place
+                                                    var number = geometryArea;
+                                                    const decimals = -Math.log10(number);
+                                                    const integerPart = Math.floor(decimals);
+                                                    const fractionalPart = decimals - integerPart;
+                                                    feature.attributes.Hectares = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                }
                                                 feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                                if (feature.attributes.LengthMetres == 0.00) {
+                                                    // Round to the nearest decimal place
+                                                    var number = geometryLength;
+                                                    const decimals = -Math.log10(number);
+                                                    const integerPart = Math.floor(decimals);
+                                                    const fractionalPart = decimals - integerPart;
+                                                    feature.attributes.LengthMetres = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                }
                                             }
                                             break;
                                     }
