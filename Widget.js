@@ -780,7 +780,7 @@ SimpleLineSymbol) {
                                     break;
                             }
                         }
-
+                        
                         // Add feature set to data
                         var reportFeatures = {};
                         reportFeatures.map = mapIntersectQueries[count].title;
@@ -831,11 +831,11 @@ SimpleLineSymbol) {
                                 "layerDefinition": null,
                                 "featureSet": {
                                     "features": [],
-                                    "geometryType": features[0].geometryType
+                                    "geometryType": features[0].geometry.type
                                 }
                             };
                             featureCollection.layerDefinition = {
-                                "geometryType": features[0].geometryType,
+                                "geometryType": features[0].geometry.type,
                                 "fields": result.fields,
 
                             };
@@ -1537,7 +1537,7 @@ SimpleLineSymbol) {
                        selectedFeature.attributes = selection.attributes;
                        self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                        // Update the display text
-                       self.featureSelected.innerHTML = displayLabel + selectedFeature.attributes[displayField];
+                       self.featureSelected.innerHTML = displayLabel + " " + selectedFeature.attributes[displayField];
                    }
                });
 
@@ -1554,7 +1554,7 @@ SimpleLineSymbol) {
                            selectedFeature.attributes = selection.attributes;
                            self.selectedFeatureJSON = JSON.stringify(selectedFeature);
                            // Update the display text
-                           self.featureSelected.innerHTML = displayLabel + selectedFeature.attributes[displayField];
+                           self.featureSelected.innerHTML = displayLabel + " " + selectedFeature.attributes[displayField];
                        }
                    });
                })
@@ -1579,7 +1579,7 @@ SimpleLineSymbol) {
                    else {
                        selectedFeature.geometry = graphicLayer.geometry;
                        self.selectedGeometry = graphicLayer.geometry;
-                       self.featureSelected.innerHTML = displayLabel + graphicLayer.attributes[displayField];
+                       self.featureSelected.innerHTML = displayLabel + " " + graphicLayer.attributes[displayField];
                    }
                    selectedFeature.attributes = graphicLayer.attributes;
                    self.selectedFeatureJSON = JSON.stringify(selectedFeature);

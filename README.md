@@ -1,14 +1,17 @@
 # Report Widget for ArcGIS Web AppBuilder
 
-Report widget.
+The report widget enables the user to configure the widget to create several maps and reports for a selected feature or user drawn graphic. The report widget includes the Web AppBuilder for ArcGIS widget and a python script to be published as a geoprocessing service to ArcGIS Server. This report widget can be added to a Web AppBuilder for ArcGIS (Developer Edition) application or can be added as an item to an enterprise portal site and used within ArcGIS Enterprise.
 
 [Demo](COMING SOON)
 
 
 ## Features
 
-* Produce a report on a feature.
-* The map type can be one of the folloeing:
+* Create several maps and reports for a selected feature.
+* Produce maps over multiple pages.
+* Drawing tool to report on drawn features.
+* Download data for intersecting features - CSV, file geodatabase or shapefile.
+* The map type can be one of the following:
 	* Map - Just a map for the selected feature.
 	* Report - Just a report for the selected feature.
 	* Report - Feature - A map and report for the selected feature using an MXD template.
@@ -18,11 +21,15 @@ Report widget.
 
 * Notepad or your favorite HTML editor
 * Web browser with access to the Internet
+* Web AppBuilder for ArcGIS (Developer Edition)
 
 
 ## Installation Instructions
 
 * Fork and then clone the repo or download the .zip file. 
+* See documentation [here](/documentation)
+* Copy the widget folder into the Web AppBuilder (Developer Edition) directory here - \client\stemapp\widgets
+* Publish the python script as a geoprocessing service.
 
 
 ## Resources
