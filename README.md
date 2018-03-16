@@ -27,7 +27,7 @@ The report widget enables the user to configure the widget to create several map
 ## Installation Instructions
 
 * Fork and then clone the repo or download the .zip file. 
-* See documentation [here](/tree/master/Documentation)
+* See documentation [here](/Documentation).
 * Copy the widget folder into the Web AppBuilder (Developer Edition) directory here - \client\stemapp\widgets
 * Publish the python script as a geoprocessing service.
 

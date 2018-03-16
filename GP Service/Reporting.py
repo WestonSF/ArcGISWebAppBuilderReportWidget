@@ -15,7 +15,7 @@
 #             - ReportLab 2.6+
 # Author:     Shaun Weston (shaun_weston@eagle.co.nz)
 # Date Created:    27/04/2017
-# Last Updated:    24/02/2018
+# Last Updated:    16/03/2018
 # Copyright:   (c) Eagle Technology
 # ArcGIS Version:   ArcMap 10.4+
 # Python Version:   2.7
@@ -69,7 +69,7 @@ import datetime
 import string
 import zipfile
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4, portrait, landscape
+from reportlab.lib.pagesizes import A4, A3, portrait, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
@@ -81,7 +81,7 @@ mergedTableData = []
 # Layers in the web map to not show in the reports
 webmaplayersNotShow = ["NES-PF Fish Spawning Indicators","NES-PF Erosion Susceptibility Classification"]
 # Layer names to not show in legend
-noLegendLayers = []
+noLegendLayers = ["Road Labels","Masterton","Carterton","South Wairarapa","Masterton Property","Carterton Property","South Wairarapa Property"]
 
 
 # Start of main function
@@ -329,13 +329,27 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                         # Reference the legend in the map document
                         legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
 
-                        # Get a list of service layers that are on in the legend because the incoming
-                        # JSON can specify which service layers/sublayers are on/off in the legend
+                        # Get a list of service layers that are on in the legend
                         legendServiceLayerNames = [lslyr.name for lslyr in legend.listLegendItemLayers()
                                            if lslyr.isServiceLayer and not lslyr.isGroupLayer]
 
-                        # Remove all layers from the legend specified in the no legend layers global array
+                        # For each layer in the legend
                         for lvlyr in legend.listLegendItemLayers():
+                            # If operational layers are in the report data object
+                            if "operationalLayers" in reportData:
+                                operationalLayers = reportData["operationalLayers"]
+                                for operationalLayer in operationalLayers:
+                                    # For this legend item
+                                    if (lvlyr.name == operationalLayer["title"]):
+                                        # If the legend extent parameter is set
+                                        if "legendExtent" in operationalLayer:
+                                            legendExtentBoolean = True
+                                            if (operationalLayer["legendExtent"].lower() == "false"):
+                                                legendExtentBoolean = False
+                                            # Update whether to use the visible extent for the legend or not, default is true
+                                            legend.updateItem(lvlyr, use_visible_extent = legendExtentBoolean)
+
+                            # Remove all layers from the legend specified in the no legend layers global array
                             if lvlyr.name in noLegendLayers:
                                 legend.removeItem(lvlyr)
 
@@ -816,17 +830,33 @@ def analysisReport(reportTitle,reportsData,reportingData):
         outputFileName = 'ReportAnalysis_{}.{}'.format(str(uuid.uuid1()), ".pdf")
         outputPath = os.path.join(arcpy.env.scratchFolder, outputFileName)
 
+        # Get the longest value in the table
+        longestFieldLength = 0
+        for row in tableData:
+            for value in row:
+                if (len(str(value)) > longestFieldLength):
+                    # Update the longest field length parameter
+                    longestFieldLength = len(str(value))
+
+        # Set the page size based on the size of the longest value
+        if(longestFieldLength > 1000):
+            printMessage("Setting page size to A3...","info")
+            reportPageSize = A3
+        else:
+            printMessage("Setting page size to A4...","info")
+            reportPageSize = A4
+
         # Export the report
         printMessage("Exporting report to PDF...","info")
         # Setup document
-        doc = SimpleDocTemplate(outputPath,pagesize=A4,
+        doc = SimpleDocTemplate(outputPath,pagesize=reportPageSize,
                                 rightMargin=40,leftMargin=40,
                                 topMargin=20,bottomMargin=20)
-        # Maximum of 4 columns for A4 portrait
+        # Maximum of 4 columns for portrait
         if (len(fieldRow) > 4):
-          doc.pagesize = landscape(A4)
+          doc.pagesize = landscape(reportPageSize)
         else:
-          doc.pagesize = portrait(A4)
+          doc.pagesize = portrait(reportPageSize)
         elements = []
 
         # Configure styles
@@ -868,7 +898,8 @@ def analysisReport(reportTitle,reportsData,reportingData):
 
         # Add a table
         tableData = [[Paragraph(cell, tableStyle) for cell in row] for row in tableData]
-        table=Table(tableData, repeatRows=1)
+        # Repeats first row on multiple pages
+        table=Table(tableData, splitByRow=1, repeatRows=1)
         table.setStyle(TableStyle([
                 ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
@@ -887,6 +918,13 @@ def analysisReport(reportTitle,reportsData,reportingData):
             # If document size is A4 landscape
             if (doc.pagesize == landscape(A4)):
                 canvas.drawString(280 * mm, 5 * mm, str(pageNumber))
+            # If document size is A3 landscape
+            elif (doc.pagesize == landscape(A3)):
+                canvas.drawString(405 * mm, 5 * mm, str(pageNumber))
+            # If document size is A3 Portrait
+            elif (doc.pagesize == portrait(A3)):
+                canvas.drawString(285 * mm, 5 * mm, str(pageNumber))
+            # If document size is A4 Portrait
             else:
                 canvas.drawString(195 * mm, 5 * mm, str(pageNumber))
 
