@@ -353,14 +353,8 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                             if lvlyr.name in noLegendLayers:
                                 legend.removeItem(lvlyr)
 
-                        # If legend is full for PDFs
+                        # If legend is full
                         if (legend.isOverflowing):
-                            printMessage("Legend is full, creating legend on new page...","info")
-
-                            # Create legend page
-                            pdfPages = pdfPages + 1
-                            legendPDF = createLegend(mxd)
-
                             # Remove the legend by moving it off the page
                             legend.elementPositionX = -5000
                             legend.elementPositionY = -5000
@@ -461,12 +455,22 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                         if (indexLayerExists == False):
                             printMessage("No index layer exists in template...","warning")
 
-                    # If legend page
-                    if (legendPDF):
-                        # Append the legend PDF
-                        PDFs.append(legendPDF)
+                    # If creating legend page
+                    if (len(arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")) > 0):
+                        # Reference the legend in the map document
+                        legend = arcpy.mapping.ListLayoutElements(mxd, "LEGEND_ELEMENT")[0]
 
-                    # If analysis report
+                        if (legend.isOverflowing):
+                            printMessage("Legend is full, creating legend on new page...","info")
+
+                            # Create legend page
+                            pdfPages = pdfPages + 1
+                            legendPDF = createLegend(mxd)
+
+                            # Append the legend PDF
+                            PDFs.append(legendPDF)
+
+                    # If creating analysis report
                     if (reportData["type"].lower() == "report - analysis"):
                         # Create the report
                         reportPDF = analysisReport(reportData["title"],reportsData,reportingData)
