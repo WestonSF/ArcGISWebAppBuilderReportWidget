@@ -58,7 +58,7 @@ function (
 
     // FUNCTION - Set the default configuration parameters in the configure widget from the config file
     setConfig: function (config) {
-        var mapFrame = this;
+        var self = this;
 
         // Set the description
         this.description.set('value', this.config.description);
@@ -104,7 +104,7 @@ function (
         ];
         var args = {
             fields: fields,
-            selectable: false
+            selectable: true
         };
         this.layerTable = new Table(args);
         this.layerTable.autoHeight = true;
@@ -168,7 +168,7 @@ function (
         }, {
             name: 'showIntersectLayer',
             title: this.nls.showIntersectLayer,
-            type: 'text',
+            type: 'checkbox',
             width: '10%',
             unique: false,
             editable: true
@@ -303,7 +303,7 @@ function (
         // Get the default report quality
         array.forEach(reportQuality, function (quality) {
             if (quality["label"].toLowerCase() == config.defaultReportQuality.toLowerCase()) {
-                mapFrame.defaultReportQualitySelect.set("value", quality["quality"]);
+                self.defaultReportQualitySelect.set("value", quality["quality"]);
             }
         });    
     },
@@ -406,7 +406,7 @@ function (
             name: 'url',
             title: this.nls.serviceURL,
             type: 'text',
-            width: '40%',
+            width: '30%',
             unique: false,
             editable: true
         }, {
@@ -419,14 +419,21 @@ function (
          }, {
             name: 'secure',
             title: this.nls.secure,
-            type: 'text',
+            type: 'checkbox',
             width: '10%',
             unique: false,
             editable: true
          }, {
              name: 'legend',
              title: this.nls.legend,
-             type: 'text',
+             type: 'checkbox',
+             width: '10%',
+             unique: false,
+             editable: true
+         }, {
+             name: 'legendExtent',
+             title: this.nls.legendExtent,
+             type: 'checkbox',
              width: '10%',
              unique: false,
              editable: true
@@ -469,6 +476,7 @@ function (
                             visibleLayers: this.config.maps[a].operationalLayers[b].visibleLayers,
                             secure: this.config.maps[a].operationalLayers[b].secure,
                             legend: this.config.maps[a].operationalLayers[b].legend,
+                            legendExtent: this.config.maps[a].operationalLayers[b].legendExtent,
                         });
                     }
                 }
@@ -482,7 +490,7 @@ function (
 
     // FUNCTION - Get the configuration parameters from the configure widget and load into configuration file
     getConfig: function () {
-        var mapFrame = this;
+        var self = this;
 
         // Get the description
         this.config.description = this.description.get('value');
@@ -557,8 +565,8 @@ function (
         }]
         // Get the default report quality
         array.forEach(reportQuality, function (quality) {
-            if (quality["quality"] == mapFrame.defaultReportQualitySelect.value) {
-                mapFrame.config.defaultReportQuality = quality["label"].toLowerCase();
+            if (quality["quality"] == self.defaultReportQualitySelect.value) {
+                self.config.defaultReportQuality = quality["label"].toLowerCase();
             }
         });
 

@@ -1,10 +1,1 @@
-{
-  "name": "Report",
-  "platform": "HTML",
-  "version": "2.7",
-  "wabVersion": "2.7",
-  "author": "Shaun Weston",
-  "description": "Creates maps and reports based on a feature in the map.",
-  "copyright": "",
-  "license": "http://www.apache.org/licenses/LICENSE-2.0"
-}
+{"name":"Report","platform":"HTML","version":"2.6","wabVersion":"2.6","author":"Shaun Weston","description":"Creates maps and reports based on a feature in the map.","copyright":"","license":"http://www.apache.org/licenses/LICENSE-2.0"}

@@ -49,7 +49,7 @@
           "title": "District Plan Zone",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/Zones/MapServer",
-          "secure": "false"
+          "secure": false
         }
       ]
     },
@@ -66,7 +66,7 @@
           "title": "District Plan Feature",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SpecialFeatures/MapServer",
-          "secure": "false"
+          "secure": false
         }
       ]
     },
@@ -83,7 +83,7 @@
           "title": "District Plan Management Area",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ManagementAreas/MapServer",
-          "secure": "false"
+          "secure": false
         }
       ]
     },
@@ -100,19 +100,19 @@
           "title": "Water Services",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/WaterInternal/MapServer",
-          "secure": "true"
+          "secure": true
         },
         {
           "title": "Sewer Services",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/SewerInternal/MapServer",
-          "secure": "true"
+          "secure": true
         },
         {
           "title": "Stormwater Services",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/StormwaterInternal/MapServer",
-          "secure": "true"
+          "secure": true
         }
       ]
     },
@@ -129,7 +129,7 @@
           "title": "Water Race",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Services/WaterRacesInternal/MapServer",
-          "secure": "true"
+          "secure": true
         }
       ]
     },
@@ -146,7 +146,7 @@
           "title": "Flood Zone",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/FloodZones/MapServer",
-          "secure": "false"
+          "secure": false
         }
       ]
     },
@@ -163,7 +163,7 @@
           "title": "Tsunami Evacuation Zone",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/TsunamiEvacuationZones/MapServer",
-          "secure": "false"
+          "secure": false
         }
       ]
     },
@@ -180,7 +180,7 @@
           "title": "Earthquake Hazard",
           "opacity": "0.7",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/EmergencyManagementAndHazards/EarthquakeHazards/MapServer",
-          "secure": "false"
+          "secure": false
         }
       ]
     },
@@ -197,8 +197,8 @@
           "title": "Carterton Imagery - 1943",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1943/MapServer",
-          "secure": "false",
-          "legend": "false"
+          "secure": false,
+          "legend": false
         }
       ]
     },
@@ -215,8 +215,8 @@
           "title": "Carterton Imagery - 1961",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1961/MapServer",
-          "secure": "false",
-          "legend": "false"
+          "secure": false,
+          "legend": false
         }
       ]
     },
@@ -233,8 +233,8 @@
           "title": "Carterton Imagery - 1974",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1974/MapServer",
-          "secure": "false",
-          "legend": "false"
+          "secure": false,
+          "legend": false
         }
       ]
     },
@@ -251,26 +251,8 @@
           "title": "Carterton Imagery - 1981",
           "opacity": "1.0",
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery1981/MapServer",
-          "secure": "false",
-          "legend": "false"
-        }
-      ]
-    },
-    {
-      "type": "Map",
-      "title": "Masterton Imagery - 2002",
-      "parentMap": "",
-      "scale": "",
-      "intersectLayer": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery2002/MapServer/1",
-      "bufferDistance": "",
-      "reportFields": "",
-      "operationalLayers": [
-        {
-          "title": "Masterton Imagery - 2002",
-          "opacity": "1.0",
-          "url": "https://gis.mstn.govt.nz/arcgis/rest/services/Basemaps/Imagery2002/MapServer",
-          "secure": "false",
-          "legend": "false"
+          "secure": false,
+          "legend": false
         }
       ]
     },
@@ -287,8 +269,8 @@
           "title": "Building Consents",
           "opacity": 1,
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/RegulatoryAndInspection/BuildingConsents/MapServer",
-          "secure": "true",
-          "legend": "false"
+          "secure": true,
+          "legend": false
         }
       ]
     },
@@ -305,8 +287,8 @@
           "title": "Resource Consents",
           "opacity": 1,
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/ResourceConsents/MapServer",
-          "secure": "true",
-          "legend": "false"
+          "secure": true,
+          "legend": false
         }
       ]
     },
@@ -323,16 +305,16 @@
           "title": "Selected Land Use Register",
           "opacity": 1,
           "url": "https://gis.mstn.govt.nz/arcgis/rest/services/ResourceManagementAndPlanning/SelectedLandUseRegister/MapServer",
-          "secure": "false",
-          "legend": "false"
+          "secure": false,
+          "legend": false
         }
       ]
     }
   ],
-  "showMultiplePageMap": "false",
+  "showMultiplePageMap": false,
   "showIntersectLayers": "false",
   "showSubtitle": "false",
   "downloadDataIntersectLayers": "false",
-  "showReportQuality": "true",
+  "showReportQuality": true,
   "defaultReportQuality": "medium"
 }

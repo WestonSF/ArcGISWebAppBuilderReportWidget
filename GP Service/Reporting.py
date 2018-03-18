@@ -15,7 +15,7 @@
 #             - ReportLab 2.6+
 # Author:     Shaun Weston (shaun_weston@eagle.co.nz)
 # Date Created:    27/04/2017
-# Last Updated:    16/03/2018
+# Last Updated:    18/03/2018
 # Copyright:   (c) Eagle Technology
 # ArcGIS Version:   ArcMap 10.4+
 # Python Version:   2.7
@@ -79,9 +79,9 @@ tablesToMerge = []
 tablesMergedCount = 0
 mergedTableData = []
 # Layers in the web map to not show in the reports
-webmaplayersNotShow = ["NES-PF Fish Spawning Indicators","NES-PF Erosion Susceptibility Classification"]
+webmaplayersNotShow = ["NES-PF Fish Spawning Indicators","NES-PF Erosion Susceptibility Classification","Boundaries"]
 # Layer names to not show in legend
-noLegendLayers = ["Road Labels","Masterton","Carterton","South Wairarapa","Masterton Property","Carterton Property","South Wairarapa Property"]
+noLegendLayers = ["Road Labels","Masterton","Carterton","South Wairarapa","Masterton Property","Carterton Property","South Wairarapa Property","Territorial Boundary","Regional Boundary"]
 
 
 # Start of main function
@@ -154,7 +154,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
             # Get the tables to merge
             for reportData in reportsData:
                 if "mergeTable" in reportData:
-                    if (reportData['mergeTable'].lower() == "true"):
+                    if (str(reportData['mergeTable']).lower() == "true"):
                         tablesToMerge.append(reportData['title'].lower())
 
             # For each report object
@@ -176,7 +176,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                         webmapData["mapOptions"]["scale"] = webmapScale
                     # If the map is to be created over multiple pages
                     if "multiplePageMap" in reportData:
-                        if(reportData["multiplePageMap"].lower() == "true"):
+                        if(str(reportData["multiplePageMap"]).lower() == "true"):
                             # Set the scale to 0, so the extent will not be fixed in the MXD and can be changed for each each index
                             webmapData["mapOptions"]["scale"] = 0
 
@@ -217,15 +217,13 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
 
                         # Add the layer object if legend paramter is not false
                         if "legend" in operationalLayer:
-                            if (operationalLayer["legend"].lower() == "true"):
+                            if (str(operationalLayer["legend"]).lower() == "true"):
                                 webmapData["layoutOptions"]["legendOptions"]["operationalLayers"].append(operationalLayer)
-                        else:
-                            webmapData["layoutOptions"]["legendOptions"]["operationalLayers"].append(operationalLayer)
 
                 # Add in the token to all secure operational layers
                 for operationalLayer in webmapData["operationalLayers"]:
                     if "secure" in operationalLayer:
-                        if (operationalLayer["secure"].lower() == "true"):
+                        if (str(operationalLayer["secure"]).lower() == "true"):
                             operationalLayer["token"] = token
 
                 # Add the graphics layers from the webmap
@@ -278,7 +276,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                     # If the map is to be created over multiple pages
                     multiplePageMap = False
                     if "multiplePageMap" in reportData:
-                        if(reportData["multiplePageMap"].lower() == "true"):
+                        if(str(reportData["multiplePageMap"]).lower() == "true"):
                             # Create the multi page index
                             mxd = multiPageIndex(mxd,selectedFeatureData)
                             multiplePageMap = True
@@ -344,7 +342,7 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
                                         # If the legend extent parameter is set
                                         if "legendExtent" in operationalLayer:
                                             legendExtentBoolean = True
-                                            if (operationalLayer["legendExtent"].lower() == "false"):
+                                            if (str(operationalLayer["legendExtent"]).lower() == "false"):
                                                 legendExtentBoolean = False
                                             # Update whether to use the visible extent for the legend or not, default is true
                                             legend.updateItem(lvlyr, use_visible_extent = legendExtentBoolean)

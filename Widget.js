@@ -801,7 +801,7 @@ SimpleLineSymbol) {
                         reportData.push(reportFeatures);
 
 
-                        // If showing intersect layers on the map
+                        // If showing this intersect layer on the map
                         if ((String(self.config.showIntersectLayers).toLowerCase() == "true") && (String(mapIntersectQueries[count].showIntersectLayer).toLowerCase() == "true")) {
                             // Add in area and length fields
                             switch (features[0].geometry.type) {
@@ -891,23 +891,25 @@ SimpleLineSymbol) {
                                                 // Clip the geometry to the selection
                                                 var clippedGeometry = geometryEngine.intersect(self.selectedGeometry, feature.geometry);
                                                 feature.geometry = clippedGeometry;
-                                                // Update length
+                                                // If valid geometry, update length
                                                 if (clippedGeometry) {
                                                     feature.geometry.type = "polyline";
                                                     var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+
+                                                    // If rounding causes the value to be zero, show the unrounded value
+                                                    feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                                    if (feature.attributes.LengthMetres == 0.00) {
+                                                        // Round to the nearest decimal place
+                                                        var number = geometryLength;
+                                                        const decimals = -Math.log10(number);
+                                                        const integerPart = Math.floor(decimals);
+                                                        const fractionalPart = decimals - integerPart;
+                                                        feature.attributes.LengthMetres = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                    }
                                                 }
+                                                // Else, blank geometry
                                                 else {
-                                                    var geometryLength = 0.00;
-                                                }
-                                                // If rounding causes the value to be zero, show the unrounded value
-                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
-                                                if (feature.attributes.LengthMetres == 0.00) {
-                                                    // Round to the nearest decimal place
-                                                    var number = geometryLength;
-                                                    const decimals = -Math.log10(number);
-                                                    const integerPart = Math.floor(decimals);
-                                                    const fractionalPart = decimals - integerPart;
-                                                    feature.attributes.LengthMetres = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                    feature.attributes.LengthMetres = 0.00;
                                                 }
                                             }
                                             break;
@@ -917,46 +919,51 @@ SimpleLineSymbol) {
                                                 // Clip the geometry to the selection
                                                 var clippedGeometry = geometryEngine.intersect(self.selectedGeometry, feature.geometry);
                                                 feature.geometry = clippedGeometry;
-                                                // Update area and length
+                                                // If valid geometry, update area and length
                                                 if (clippedGeometry) {
                                                     feature.geometry.type = "polygon";
                                                     var geometryArea = geometryEngine.planarArea(clippedGeometry, "hectares");
                                                     var geometryLength = geometryEngine.planarLength(clippedGeometry, "meters");
+
+                                                    // If rounding causes the value to be zero, show the unrounded value
+                                                    feature.attributes.Hectares = parseFloat(geometryArea).toFixed(2);
+                                                    if (feature.attributes.Hectares == 0.00) {
+                                                        // Round to the nearest decimal place
+                                                        var number = geometryArea;
+                                                        const decimals = -Math.log10(number);
+                                                        const integerPart = Math.floor(decimals);
+                                                        const fractionalPart = decimals - integerPart;
+                                                        feature.attributes.Hectares = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                    }
+                                                    feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
+                                                    if (feature.attributes.LengthMetres == 0.00) {
+                                                        // Round to the nearest decimal place
+                                                        var number = geometryLength;
+                                                        const decimals = -Math.log10(number);
+                                                        const integerPart = Math.floor(decimals);
+                                                        const fractionalPart = decimals - integerPart;
+                                                        feature.attributes.LengthMetres = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                    }
                                                 }
+                                                // Else, blank geometry
                                                 else {
-                                                    var geometryArea = 0.00;
-                                                    var geometryLength = 0.00;
-                                                }
-                                                // If rounding causes the value to be zero, show the unrounded value
-                                                feature.attributes.Hectares = parseFloat(geometryArea).toFixed(2);
-                                                if (feature.attributes.Hectares == 0.00) {
-                                                    // Round to the nearest decimal place
-                                                    var number = geometryArea;
-                                                    const decimals = -Math.log10(number);
-                                                    const integerPart = Math.floor(decimals);
-                                                    const fractionalPart = decimals - integerPart;
-                                                    feature.attributes.Hectares = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
-                                                }
-                                                feature.attributes.LengthMetres = parseFloat(geometryLength).toFixed(2);
-                                                if (feature.attributes.LengthMetres == 0.00) {
-                                                    // Round to the nearest decimal place
-                                                    var number = geometryLength;
-                                                    const decimals = -Math.log10(number);
-                                                    const integerPart = Math.floor(decimals);
-                                                    const fractionalPart = decimals - integerPart;
-                                                    feature.attributes.LengthMetres = number.toFixed(Math.max(0, fractionalPart >= -Math.log10(.5) ? Math.ceil(decimals) : integerPart));
+                                                    feature.attributes.Hectares = 0.00;
+                                                    feature.attributes.LengthMetres = 0.00;
                                                 }
                                             }
                                             break;
                                     }
-                                    // Add to features array
-                                    featuresToAdd.push(feature);
-                                    // Add features to data download object
-                                    var dataFeature = {};
-                                    dataFeature.attributes = feature.attributes;
-                                    // Get the geoemtry
-                                    dataFeature.geometry = {};
+
+                                    // If valid geometry
                                     if (feature.geometry) {
+                                        // Add to features array
+                                        featuresToAdd.push(feature);
+                                        // Add features to data download object
+                                        var dataFeature = {};
+                                        dataFeature.attributes = feature.attributes;
+                                        // Get the geoemtry
+                                        dataFeature.geometry = {};
+
                                         switch (feature.geometry.type) {
                                             case "point":
                                                 dataFeature.geometry.x = feature.geometry.x;
@@ -966,8 +973,8 @@ SimpleLineSymbol) {
                                             case "polygon":
                                                 dataFeature.geometry.rings = feature.geometry.rings;
                                         }
+                                        dataFeatures.push(dataFeature);
                                     }
-                                    dataFeatures.push(dataFeature);
                                 }
                             });
                             data.features = dataFeatures;
@@ -1000,9 +1007,22 @@ SimpleLineSymbol) {
       }
 
       // FUNCTION - Submit parameters to GP service
-      function submitReport() {
+      function submitReport() {    
           // Update maps to produce array based on spatial query
           array.forEach(reportData, function (report) {
+              var reportFeaturesLength = report.features.length;
+              // For each feature
+              for (var i = 0; i < report.features.length; i++) {
+                  var feature = report.features[i];
+                  // Remove any blank features from the report data
+                  if (feature.LengthMetres == 0) {
+                      // Remove feature
+                      report.features.splice(i, 1);
+                      // Go back to start of loop
+                      i = 0;
+                  }  
+              }
+              
               mapsProduce.push(report.map);
           });
 
