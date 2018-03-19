@@ -800,6 +800,21 @@ SimpleLineSymbol) {
                         }
                         reportData.push(reportFeatures);
 
+                        // For each field
+                        array.forEach(reportFeatures.fields, function (field) {
+                            // If the field type is a date
+                            if (field.type.toLowerCase() == "esrifieldtypedate") {
+                                // For each feature
+                                array.forEach(reportFeatures.features, function (feature) {  
+                                    if (feature[field.name]) {
+                                        // Convert to a date field
+                                        var date = new Date(feature[field.name]);
+                                        // Update the value from date to a string
+                                        feature[field.name] = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear();
+                                    }
+                                });        
+                            }
+                        });
 
                         // If showing this intersect layer on the map
                         if ((String(self.config.showIntersectLayers).toLowerCase() == "true") && (String(mapIntersectQueries[count].showIntersectLayer).toLowerCase() == "true")) {
