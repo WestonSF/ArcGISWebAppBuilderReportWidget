@@ -15,7 +15,7 @@
 #             - ReportLab 2.6+
 # Author:     Shaun Weston (shaun_weston@eagle.co.nz)
 # Date Created:    27/04/2017
-# Last Updated:    18/03/2018
+# Last Updated:    29/04/2019
 # Copyright:   (c) Eagle Technology
 # ArcGIS Version:   ArcMap 10.4+
 # Python Version:   2.7
@@ -68,6 +68,7 @@ import urllib
 import datetime
 import string
 import zipfile
+import ssl
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, A3, portrait, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -94,10 +95,6 @@ def mainFunction(selectedFeatureJSON,webmapJSON,reportsJSON,reportingJSON,downlo
         global noLegendLayers
 
         if ((selectedFeatureJSON) and (webmapJSON) and (reportsJSON) and (reportingJSON)):
-            # Workaround for Eagle web server SSL issue
-            webmapJSON = webmapJSON.replace("https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com", "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com")
-            reportsJSON = reportsJSON.replace("https://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com", "http://ec2-52-64-20-102.ap-southeast-2.compute.amazonaws.com")
-
             # If portal site is specified
             if (portalUrl):
                 printMessage("Connecting to Portal - " + portalUrl + "...","info")
@@ -1111,8 +1108,8 @@ def generateToken(username, password, portalUrl):
                         'f' : 'json'})
     parameters = parameters.encode('utf-8')
     try:
-        urllib2.urlopen(portalUrl + '/sharing/rest/generateToken?',parameters)
-        response = urllib2.urlopen(portalUrl + '/sharing/rest/generateToken?',parameters)
+        context = ssl._create_unverified_context()
+        response = urllib2.urlopen(portalUrl + '/sharing/rest/generateToken?',parameters, context=context)
     except Exception as e:
         printMessage( 'Unable to open the url %s/sharing/rest/generateToken' % (portalUrl),'error')
         printMessage(e,'error')

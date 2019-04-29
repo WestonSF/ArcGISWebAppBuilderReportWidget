@@ -1,0 +1,729 @@
+                   { "description": "Select a layer, click a feature on the map, then select the reports or maps to include.",
+                    "gpService": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Tools/Reporting/GPServer/Reporting",
+                    "layers": [
+                        {
+                            "layerName": "Property",
+                            "serviceURL": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer/8",
+                            "displayLabel": "",
+                            "displayField": "Location"
+                        }
+                    ],
+                    "enableDraw": false,
+                    "maps": [
+                        {
+                            "type": "Map",
+                            "title": "Aerial Photography",
+                            "parentMap": "",
+                            "scale": "500",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "1. Aerial Photography",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "District Plan Zones",
+                            "parentMap": "",
+                            "scale": "1000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "0",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "Operative District Plan Zones",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DistrictPlan1999Zones/MapServer",
+                                    "visibleLayers": [],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Proposed District Plan Appeals Version (2018) - Plan Zones",
+                            "parentMap": "",
+                            "scale": "1000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "0",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DP2018Appeals/MapServer",
+                                    "visibleLayers": [
+                                        5,
+                                        6,
+                                        7,
+                                        8,
+                                        9,
+                                        10,
+                                        11,
+                                        12
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "District Plan Features",
+                            "parentMap": "",
+                            "scale": "2000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "0",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DistrictPlan1999Features/MapServer",
+                                    "visibleLayers": [],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Proposed District Plan Appeals Version (2018) - Plan Features",
+                            "parentMap": "",
+                            "scale": "2000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DP2018Appeals/MapServer",
+                                    "visibleLayers": [
+                                        13,
+                                        14,
+                                        15,
+                                        16,
+                                        17,
+                                        18,
+                                        19,
+                                        20,
+                                        21,
+                                        23,
+                                        24,
+                                        25,
+                                        26,
+                                        27,
+                                        28,
+                                        29,
+                                        30,
+                                        31,
+                                        32,
+                                        34,
+                                        35,
+                                        36,
+                                        37,
+                                        38,
+                                        39,
+                                        40,
+                                        41
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Proposed District Plan Appeals Version (2018) - Natural Features",
+                            "parentMap": "",
+                            "scale": "2000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "0",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DP2018Appeals/MapServer",
+                                    "visibleLayers": [
+                                        46,
+                                        47,
+                                        48,
+                                        49,
+                                        50,
+                                        51,
+                                        52,
+                                        53,
+                                        54,
+                                        55,
+                                        56,
+                                        57,
+                                        58
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "District Plan Rural Subdivision",
+                            "parentMap": "",
+                            "scale": "6000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DistrictPlan1999RuralSubdivision/MapServer",
+                                    "visibleLayers": [],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "District Plan Natural Hazards - Active Faults",
+                            "parentMap": "",
+                            "scale": "4000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                              {
+                                "title": "",
+                                "opacity": "",
+                                "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                "visibleLayers": [
+                                  1
+                                ],
+                                "secure": false,
+                                "legend": false,
+                                "legendExtent": false
+                              },
+                                {
+                                    "title": "District Plan Flood",
+                                    "opacity": "0.75",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/DistrictPlan1999NaturalHazards/MapServer",
+                                    "visibleLayers": [
+                                        0,
+                                        1,
+                                        2,
+                                        3,
+                                        4,
+                                        5
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "District Plan Natural Hazards - Flooding",
+                            "parentMap": "",
+                            "scale": "2000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "1",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DistrictPlan1999NaturalHazards/MapServer",
+                                    "visibleLayers": [
+                                        6,
+                                        7,
+                                        8,
+                                        9,
+                                        10,
+                                        11,
+                                        12,
+                                        13,
+                                        14,
+                                        15,
+                                        16
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "",
+                                    "visibleLayers": [],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Proposed District Plan Appeals Version (2018) - Natural Hazards",
+                            "parentMap": "",
+                            "scale": "2000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "DP2017 Natural Features",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/DP2018Appeals/MapServer",
+                                    "visibleLayers": [
+                                        42,
+                                        43,
+                                        44,
+                                        45
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Latest Flood Hazards",
+                            "parentMap": "",
+                            "scale": "2000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "Latest Flood Hazards",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/LatestNaturalHazards/MapServer",
+                                    "visibleLayers": [
+                                        12,
+                                        13,
+                                        14,
+                                        15,
+                                        16,
+                                        17,
+                                        18,
+                                        19,
+                                        20,
+                                        21
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Report - Analysis",
+                            "title": "Resource Consents",
+                            "parentMap": "",
+                            "scale": "750",
+                            "intersectLayer": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/LIMPrintResourceConsents/MapServer",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "75",
+                            "reportFields": "consent_id>Resource Consent Number,Location>Location,Valuation_ID>Valuation Number,Legal>Property Legal Description,Consent_Type>Consent Type,Proposal_1>Consent Proposal,Notified_YN>Notified Yes/No,Hearing_YN>Hearing Yes/No,status_details>Consent Status,decision_date>Decision Date,application_date>App.Date",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "Resource Consents",
+                                    "opacity": "1.0",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/LIMPrintResourceConsents/MapServer",
+                                    "visibleLayers": [],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgisadm/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Health and Alcohol Licenses",
+                            "parentMap": "",
+                            "scale": "1000",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/LIMPrintLicenses/MapServer",
+                                    "visibleLayers": [],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Map",
+                            "title": "Services Network",
+                            "parentMap": "",
+                            "scale": "800",
+                            "intersectLayer": "",
+                            "showIntersectLayer": false,
+                            "bufferDistance": "",
+                            "reportFields": "",
+                            "operationalLayers": [
+                                {
+                                    "title": "",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/MiscGeneral/MapServer",
+                                    "visibleLayers": [
+                                        1
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                },
+                                {
+                                    "title": "Services",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/ServicesCS/MapServer",
+                                    "visibleLayers": [
+                                        0,
+                                        1,
+                                        2,
+                                        3,
+                                        5,
+                                        6,
+                                        7,
+                                        8,
+                                        9,
+                                        10,
+                                        11,
+                                        12
+                                    ],
+                                    "secure": false,
+                                    "legend": true,
+                                    "legendExtent": true
+                                },
+                                {
+                                    "title": "Property",
+                                    "opacity": "",
+                                    "url": "https://intgis.kcdc.govt.nz/arcgis/rest/services/Property/MapServer",
+                                    "visibleLayers": [
+                                        2,
+                                        5,
+                                        6,
+                                        8
+                                    ],
+                                    "secure": false,
+                                    "legend": false,
+                                    "legendExtent": false
+                                }
+                            ]
+                        }
+                    ],
+                    "showIntersectLayers": false,
+                    "downloadDataIntersectLayers": false,
+                    "showReportQuality": false,
+                    "defaultReportQuality": "medium",
+                    "enableSearchIntegration": true
+                }
